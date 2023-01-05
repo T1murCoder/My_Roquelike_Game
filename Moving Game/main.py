@@ -179,6 +179,23 @@ class Border(pygame.sprite.Sprite):
                 self.rect.y = height - 10
 
 
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+
+
 def spawn_enemies(count):
     for i in range(count):
         enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
@@ -199,6 +216,8 @@ if __name__ == '__main__':
     player_sprite = pygame.sprite.Group()
     bullet_sprites = pygame.sprite.Group()
     enemies_sprites = pygame.sprite.Group()
+
+    camera = Camera()
 
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
     Border("left", [all_sprites, borders_sprites])
@@ -221,7 +240,15 @@ if __name__ == '__main__':
                 if event.button == 1:
                     player.shoot(event.pos[0], event.pos[1])
 
+        # изменяем ракурс камеры
+        camera.update(player)
+        # обновляем положение всех спрайтов
+        for sprite in all_sprites:
+            camera.apply(sprite)
+
         screen.fill(pygame.Color("black"))
         all_sprites.update()
         all_sprites.draw(screen)
+        #camera_group.update()
+        #camera_group.custom_draw(player)
         pygame.display.flip()
