@@ -61,7 +61,7 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self, direction):
         if self.ready_to_shoot:
-            bullet_x = self.rect.x + self.rect[2] // 2
+            bullet_x = self.rect.x
             bullet_y = self.rect.y
             Bullet(bullet_x, bullet_y, direction, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
@@ -83,12 +83,14 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
+    image = pygame.Surface((21, 21))
+    pygame.draw.circle(image, "gray", (11, 11), 10)
+    image.set_colorkey(image.get_at((0, 0)))
+    image = image.convert_alpha()
+
     def __init__(self, x, y, direction, *group):
         super().__init__(*group)
-        self.image = pygame.Surface((21, 21))
-        pygame.draw.circle(self.image, "gray", (11, 11), 10)
-        self.image.set_colorkey(self.image.get_at((0, 0)))
-        self.image = self.image.convert_alpha()
+        self.image = Bullet.image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -157,15 +159,6 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                # Player Movement
-                if event.key == pygame.K_w:
-                    move_up = True
-                elif event.key == pygame.K_s:
-                    move_down = True
-                elif event.key == pygame.K_d:
-                    move_right = True
-                elif event.key == pygame.K_a:
-                    move_left = True
                 # Shooting
                 if event.key == pygame.K_RIGHT:
                     player.shoot("right")
@@ -176,24 +169,15 @@ if __name__ == '__main__':
                 elif event.key == pygame.K_DOWN:
                     player.shoot("down")
 
-            elif event.type == pygame.KEYUP:
-                # Player Movement
-                if event.key == pygame.K_w:
-                    move_up = False
-                elif event.key == pygame.K_s:
-                    move_down = False
-                elif event.key == pygame.K_d:
-                    move_right = False
-                elif event.key == pygame.K_a:
-                    move_left = False
-
-        if move_up:
+        pressed = pygame.key.get_pressed()
+        # Player movement
+        if pressed[pygame.K_w]:
             player.update("up")
-        if move_down:
+        if pressed[pygame.K_s]:
             player.update("down")
-        if move_right:
+        if pressed[pygame.K_d]:
             player.update("right")
-        if move_left:
+        if pressed[pygame.K_a]:
             player.update("left")
 
         screen.fill(pygame.Color("black"))
