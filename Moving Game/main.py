@@ -44,6 +44,7 @@ class Player(pygame.sprite.Sprite):
         self.time_gone_from_shot = 0
 
     def move(self, direction):
+        # Player movement
         if direction == "right":
             self.rect = self.rect.move(self.speed, 0)
             if pygame.sprite.spritecollideany(self, borders_sprites):
@@ -61,20 +62,33 @@ class Player(pygame.sprite.Sprite):
             if pygame.sprite.spritecollideany(self, borders_sprites):
                 self.rect = self.rect.move(0, -self.speed)
 
+    def input(self):
+        pressed = pygame.key.get_pressed()
+        # Player movement
+        if pressed[pygame.K_w]:
+            player.move("up")
+        if pressed[pygame.K_s]:
+            player.move("down")
+        if pressed[pygame.K_d]:
+            player.move("right")
+        if pressed[pygame.K_a]:
+            player.move("left")
+
     def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
+            # Spawn Bullet
             bullet_x = self.rect.x
             bullet_y = self.rect.y
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
 
     def update(self, *args):
-        if not args:
-            if not self.ready_to_shoot:
-                self.time_gone_from_shot += 1
-                if self.time_gone_from_shot == self.fire_cooldown:
-                    self.ready_to_shoot = True
-                    self.time_gone_from_shot = 0
+        self.input()
+        if not self.ready_to_shoot:
+            self.time_gone_from_shot += 1
+            if self.time_gone_from_shot == self.fire_cooldown:
+                self.ready_to_shoot = True
+                self.time_gone_from_shot = 0
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -91,6 +105,7 @@ class Enemy(pygame.sprite.Sprite):
         self.health = health
 
     def move(self):
+        # Calculate the direction
         x_diff = player.rect.x - self.rect.x
         y_diff = player.rect.y - self.rect.y
         angle = math.atan2(y_diff, x_diff)
@@ -125,6 +140,7 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 15
 
     def move(self):
+        # Calculate the direction
         x_diff = self.mouse_x - self.spawn_x
         y_diff = self.mouse_y - self.spawn_y
         angle = math.atan2(y_diff, x_diff)
@@ -138,14 +154,6 @@ class Bullet(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
         self.move()
-        '''if self.direction == 'right':
-            self.rect = self.rect.move(self.speed, 0)
-        elif self.direction == 'left':
-            self.rect = self.rect.move(-self.speed, 0)
-        elif self.direction == 'up':
-            self.rect = self.rect.move(0, -self.speed)
-        elif self.direction == 'down':
-            self.rect = self.rect.move(0, self.speed)'''
 
 
 class Border(pygame.sprite.Sprite):
@@ -173,13 +181,13 @@ class Border(pygame.sprite.Sprite):
 
 def spawn_enemies(count):
     for i in range(count):
-        enemy_x = random.randint(0, width - Enemy.image.get_rect()[2] - 10)
-        enemy_y = random.randint(0, height - Enemy.image.get_rect()[3] - 10)
+        enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
+        enemy_y = random.randint(10, height - Enemy.image.get_rect()[3] - 10)
         enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
         while pygame.sprite.spritecollideany(enemy, player_sprite):
             enemy.kill()
-            enemy_x = random.randint(0, width - Enemy.image.get_rect()[2] - 10)
-            enemy_y = random.randint(0, height - Enemy.image.get_rect()[3] - 10)
+            enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
+            enemy_y = random.randint(10, height - Enemy.image.get_rect()[3] - 10)
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
 
 
@@ -207,31 +215,11 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                # Shooting
-                '''if event.key == pygame.K_RIGHT:
-                    player.shoot("right")
-                elif event.key == pygame.K_LEFT:
-                    player.shoot("left")
-                elif event.key == pygame.K_UP:
-                    player.shoot("up")
-                elif event.key == pygame.K_DOWN:
-                    player.shoot("down")'''
                 pass
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Shooting
                 if event.button == 1:
                     player.shoot(event.pos[0], event.pos[1])
-
-
-        pressed = pygame.key.get_pressed()
-        # Player movement
-        if pressed[pygame.K_w]:
-            player.move("up")
-        if pressed[pygame.K_s]:
-            player.move("down")
-        if pressed[pygame.K_d]:
-            player.move("right")
-        if pressed[pygame.K_a]:
-            player.move("left")
 
         screen.fill(pygame.Color("black"))
         all_sprites.update()
