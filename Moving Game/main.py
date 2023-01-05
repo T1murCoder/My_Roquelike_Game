@@ -67,9 +67,6 @@ class Player(pygame.sprite.Sprite):
             self.ready_to_shoot = False
 
     def update(self, *args):
-        if not pygame.sprite.spritecollideany(self, borders_sprites):
-            for elem in args:
-                self.move_player(elem)
         if not args:
             if not self.ready_to_shoot:
                 self.time_gone_from_shot += 1
@@ -172,13 +169,13 @@ if __name__ == '__main__':
         pressed = pygame.key.get_pressed()
         # Player movement
         if pressed[pygame.K_w]:
-            player.update("up")
+            player.move_player("up")
         if pressed[pygame.K_s]:
-            player.update("down")
+            player.move_player("down")
         if pressed[pygame.K_d]:
-            player.update("right")
+            player.move_player("right")
         if pressed[pygame.K_a]:
-            player.update("left")
+            player.move_player("left")
 
         screen.fill(pygame.Color("black"))
         all_sprites.update()
