@@ -1,6 +1,6 @@
 import random
 
-import pygame
+import math
 
 import os
 import sys
@@ -91,9 +91,15 @@ class Enemy(pygame.sprite.Sprite):
         self.health = health
 
     def move(self):
-        pass
+        x_diff = player.rect.x - self.rect.x
+        y_diff = player.rect.y - self.rect.y
+        angle = math.atan2(y_diff, x_diff)
+        x_movement = int(math.cos(angle) * self.speed)
+        y_movement = int(math.sin(angle) * self.speed)
+        self.rect = self.rect.move(x_movement, y_movement)
 
     def update(self, *args):
+        self.move()
         if self.health == 0:
             self.kill()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
