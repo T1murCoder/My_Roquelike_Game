@@ -61,11 +61,11 @@ class Player(pygame.sprite.Sprite):
             if pygame.sprite.spritecollideany(self, borders_sprites):
                 self.rect = self.rect.move(0, -self.speed)
 
-    def shoot(self, direction):
+    def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
             bullet_x = self.rect.x
             bullet_y = self.rect.y
-            Bullet(bullet_x, bullet_y, direction, [bullet_sprites, all_sprites])
+            Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
 
     def update(self, *args):
@@ -112,28 +112,40 @@ class Bullet(pygame.sprite.Sprite):
     image.set_colorkey(image.get_at((0, 0)))
     image = image.convert_alpha()
 
-    def __init__(self, x, y, direction, *group):
+    def __init__(self, x, y, mouse_x, mouse_y, *group):
         super().__init__(*group)
         self.image = Bullet.image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.spawn_x = x
+        self.spawn_y = y
+        self.mouse_x = mouse_x
+        self.mouse_y = mouse_y
         self.speed = 15
-        self.direction = direction
+
+    def move(self):
+        x_diff = self.mouse_x - self.spawn_x
+        y_diff = self.mouse_y - self.spawn_y
+        angle = math.atan2(y_diff, x_diff)
+        x_movement = int(math.cos(angle) * self.speed)
+        y_movement = int(math.sin(angle) * self.speed)
+        self.rect = self.rect.move(x_movement, y_movement)
 
     def update(self, *args):
         if pygame.sprite.spritecollideany(self, borders_sprites):
             self.kill()
         if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
-        if self.direction == 'right':
+        self.move()
+        '''if self.direction == 'right':
             self.rect = self.rect.move(self.speed, 0)
         elif self.direction == 'left':
             self.rect = self.rect.move(-self.speed, 0)
         elif self.direction == 'up':
             self.rect = self.rect.move(0, -self.speed)
         elif self.direction == 'down':
-            self.rect = self.rect.move(0, self.speed)
+            self.rect = self.rect.move(0, self.speed)'''
 
 
 class Border(pygame.sprite.Sprite):
@@ -196,14 +208,19 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.KEYDOWN:
                 # Shooting
-                if event.key == pygame.K_RIGHT:
+                '''if event.key == pygame.K_RIGHT:
                     player.shoot("right")
                 elif event.key == pygame.K_LEFT:
                     player.shoot("left")
                 elif event.key == pygame.K_UP:
                     player.shoot("up")
                 elif event.key == pygame.K_DOWN:
-                    player.shoot("down")
+                    player.shoot("down")'''
+                pass
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    player.shoot(event.pos[0], event.pos[1])
+
 
         pressed = pygame.key.get_pressed()
         # Player movement
