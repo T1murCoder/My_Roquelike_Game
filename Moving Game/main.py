@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 import os
@@ -41,7 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.fire_cooldown = 7
         self.time_gone_from_shot = 0
 
-    def move_player(self, direction):
+    def move(self, direction):
         if direction == "right":
             self.rect = self.rect.move(self.speed, 0)
             if pygame.sprite.spritecollideany(self, borders_sprites):
@@ -76,7 +78,26 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    pass
+    image = pygame.Surface((30, 50))
+    pygame.draw.rect(image, pygame.Color("red"), (0, 0, 30, 50))
+
+    def __init__(self, x, y, health, *group):
+        super().__init__(*group)
+        self.image = Enemy.image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = 5
+        self.health = health
+
+    def move(self):
+        pass
+
+    def update(self, *args):
+        if self.health == 0:
+            self.kill()
+        if pygame.sprite.spritecollideany(self, bullet_sprites):
+            self.health -= 1
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -96,6 +117,8 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self, *args):
         if pygame.sprite.spritecollideany(self, borders_sprites):
+            self.kill()
+        if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
         if self.direction == 'right':
             self.rect = self.rect.move(self.speed, 0)
@@ -130,6 +153,18 @@ class Border(pygame.sprite.Sprite):
                 self.rect.y = height - 10
 
 
+def spawn_enemies(count):
+    for i in range(count):
+        enemy_x = random.randint(0, width - Enemy.image.get_rect()[2] - 10)
+        enemy_y = random.randint(0, height - Enemy.image.get_rect()[3] - 10)
+        enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+        while pygame.sprite.spritecollideany(enemy, player_sprite):
+            enemy.kill()
+            enemy_x = random.randint(0, width - Enemy.image.get_rect()[2] - 10)
+            enemy_y = random.randint(0, height - Enemy.image.get_rect()[3] - 10)
+            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+
+
 if __name__ == '__main__':
     fps = 30
 
@@ -137,6 +172,7 @@ if __name__ == '__main__':
     borders_sprites = pygame.sprite.Group()
     player_sprite = pygame.sprite.Group()
     bullet_sprites = pygame.sprite.Group()
+    enemies_sprites = pygame.sprite.Group()
 
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
     Border("left", [all_sprites, borders_sprites])
@@ -144,10 +180,7 @@ if __name__ == '__main__':
     Border("up", [all_sprites, borders_sprites])
     Border("down", [all_sprites, borders_sprites])
 
-    move_up = False
-    move_down = False
-    move_right = False
-    move_left = False
+    spawn_enemies(5)
 
     running = True
     while running:
@@ -169,13 +202,13 @@ if __name__ == '__main__':
         pressed = pygame.key.get_pressed()
         # Player movement
         if pressed[pygame.K_w]:
-            player.move_player("up")
+            player.move("up")
         if pressed[pygame.K_s]:
-            player.move_player("down")
+            player.move("down")
         if pressed[pygame.K_d]:
-            player.move_player("right")
+            player.move("right")
         if pressed[pygame.K_a]:
-            player.move_player("left")
+            player.move("left")
 
         screen.fill(pygame.Color("black"))
         all_sprites.update()
