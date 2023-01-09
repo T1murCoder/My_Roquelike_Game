@@ -31,10 +31,18 @@ def load_image(name, colorkey=None):
 
 
 class Player(pygame.sprite.Sprite):
+    stand_image = load_image("hero/hero-stand.png")
+    right_images = [load_image("hero-walk_1_R"),
+                    load_image("hero-walk_2_R"),
+                    load_image("hero-walk_3_R"),
+                    load_image("hero-walk_4_R")]
+    left_images = []
+
     def __init__(self, x, y, *group):
         super().__init__(*group)
-        self.image = pygame.Surface((30, 50))
-        pygame.draw.rect(self.image, pygame.Color("blue"), (0, 0, 30, 50))
+        # self.image = pygame.Surface((30, 50))
+        # pygame.draw.rect(self.image, pygame.Color("blue"), (0, 0, 30, 50))
+        self.image = Player.stand_image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -77,8 +85,8 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
             # Spawn Bullet
-            bullet_x = self.rect.x
-            bullet_y = self.rect.y
+            bullet_x = self.rect.centerx
+            bullet_y = self.rect.centery
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
 
