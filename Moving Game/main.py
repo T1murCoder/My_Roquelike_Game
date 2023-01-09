@@ -179,6 +179,18 @@ class Border(pygame.sprite.Sprite):
                 self.rect.y = height - 10
 
 
+class Crosshair(pygame.sprite.Sprite):
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = load_image("crosshair/crosshair.png")
+        self.rect = self.image.get_rect()
+        self.rect.centerx = pygame.mouse.get_pos()[0]
+        self.rect.centery = pygame.mouse.get_pos()[1]
+
+    def update(self):
+        self.rect.centerx, self.rect.centery = pygame.mouse.get_pos()
+
+
 class Camera:
     # зададим начальный сдвиг камеры
     def __init__(self):
@@ -196,6 +208,15 @@ class Camera:
         self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
 
 
+class AllSpritesGroup(pygame.sprite.Group):
+    def __init__(self):
+        super().__init__()
+
+    def draw(self, surface):
+        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
+            surface.blit(sprite.image, sprite.rect.topleft)
+
+
 def spawn_enemies(count):
     for i in range(count):
         enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
@@ -211,15 +232,25 @@ def spawn_enemies(count):
 if __name__ == '__main__':
     fps = 30
 
-    all_sprites = pygame.sprite.Group()
+    pygame.mouse.set_visible(False)
+
+    all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
     player_sprite = pygame.sprite.Group()
     bullet_sprites = pygame.sprite.Group()
     enemies_sprites = pygame.sprite.Group()
+    crosshair_sprite = pygame.sprite.Group()
 
+    # create Camera
     camera = Camera()
 
+    # create Crosshair
+    Crosshair(crosshair_sprite)
+
+    # create Player
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
+
+    # create Borders
     Border("left", [all_sprites, borders_sprites])
     Border("right", [all_sprites, borders_sprites])
     Border("up", [all_sprites, borders_sprites])
@@ -247,8 +278,11 @@ if __name__ == '__main__':
             camera.apply(sprite)
 
         screen.fill(pygame.Color("black"))
+
         all_sprites.update()
         all_sprites.draw(screen)
-        #camera_group.update()
-        #camera_group.custom_draw(player)
+
+        crosshair_sprite.update()
+        crosshair_sprite.draw(screen)
+
         pygame.display.flip()
