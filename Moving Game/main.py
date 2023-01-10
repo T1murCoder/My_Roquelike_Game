@@ -78,15 +78,21 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         pressed = pygame.key.get_pressed()
         # Player movement
+        key_pressed = False
         if pressed[pygame.K_w]:
             player.move("up")
+            key_pressed = True
         if pressed[pygame.K_s]:
             player.move("down")
+            key_pressed = True
         if pressed[pygame.K_d]:
             player.move("right")
+            key_pressed = True
         if pressed[pygame.K_a]:
             player.move("left")
-        self.change_phase()
+            key_pressed = True
+        if key_pressed:
+            self.change_phase()
         if not pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_d] and not pressed[pygame.K_a]:
             self.change_phase(reset=True)
 
