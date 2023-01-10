@@ -115,7 +115,7 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
-            # Spawn Bullet
+            # Spawn bullet
             bullet_x = self.rect.centerx
             bullet_y = self.rect.centery
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
@@ -161,17 +161,23 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
-    image = pygame.Surface((21, 21))
-    pygame.draw.circle(image, "gray", (11, 11), 10)
-    image.set_colorkey(image.get_at((0, 0)))
-    image = image.convert_alpha()
+    image = load_image("bullet/green_bullet.png")
 
     def __init__(self, x, y, mouse_x, mouse_y, *group):
         super().__init__(*group)
         self.image = Bullet.image
+        self.image = pygame.transform.scale(self.image, (11, 21))
+        self.image = pygame.transform.rotate(self.image, -90)
+
+        # Calculate the angle to rotate image
+        x_diff = mouse_x - x
+        y_diff = mouse_y - y
+        angle = math.degrees(math.atan2(-y_diff, x_diff))
+        self.image = pygame.transform.rotate(self.image, angle)
+
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.centerx = x
+        self.rect.centery = y
         self.spawn_x = x
         self.spawn_y = y
         self.mouse_x = mouse_x
