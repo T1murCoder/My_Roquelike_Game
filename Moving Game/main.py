@@ -31,22 +31,25 @@ def load_image(name, colorkey=None):
 
 
 class Player(pygame.sprite.Sprite):
-    stand_image = load_image("hero/hero-stand.png")
-    right_images = [load_image("hero-walk_1_R"),
-                    load_image("hero-walk_2_R"),
-                    load_image("hero-walk_3_R"),
-                    load_image("hero-walk_4_R")]
-    left_images = []
+    stand_image_right = load_image("hero/hero-stand_R.png")
+    stand_image_left = pygame.transform.flip(load_image("hero/hero-stand_R.png"), True, False)
+    right_images = [load_image("hero/hero-walk_1_R.png"),
+                    load_image("hero/hero-walk_2_R.png"),
+                    load_image("hero/hero-walk_3_R.png"),
+                    load_image("hero/hero-walk_4_R.png")]
+    left_images = [pygame.transform.flip(elem, True, False) for elem in right_images]
 
     def __init__(self, x, y, *group):
         super().__init__(*group)
         # self.image = pygame.Surface((30, 50))
         # pygame.draw.rect(self.image, pygame.Color("blue"), (0, 0, 30, 50))
-        self.image = Player.stand_image
+        self.image = Player.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.speed = 10
+        self.orientation = "right"
+        self.phase = 0
         self.ready_to_shoot = True
         self.fire_cooldown = 7
         self.time_gone_from_shot = 0
@@ -57,10 +60,12 @@ class Player(pygame.sprite.Sprite):
             self.rect = self.rect.move(self.speed, 0)
             if pygame.sprite.spritecollideany(self, borders_sprites):
                 self.rect = self.rect.move(-self.speed, 0)
+            self.orientation = "right"
         elif direction == "left":
             self.rect = self.rect.move(-self.speed, 0)
             if pygame.sprite.spritecollideany(self, borders_sprites):
                 self.rect = self.rect.move(self.speed, 0)
+            self.orientation = "left"
         elif direction == "up":
             self.rect = self.rect.move(0, -self.speed)
             if pygame.sprite.spritecollideany(self, borders_sprites):
@@ -81,6 +86,26 @@ class Player(pygame.sprite.Sprite):
             player.move("right")
         if pressed[pygame.K_a]:
             player.move("left")
+        self.change_phase()
+        if not pressed[pygame.K_w] and not pressed[pygame.K_s] and not pressed[pygame.K_d] and not pressed[pygame.K_a]:
+            self.change_phase(reset=True)
+
+    def change_phase(self, reset=False):
+        if reset:
+            self.phase = 0
+            if self.orientation == "right":
+                self.image = Player.stand_image_right
+            else:
+                self.image = Player.stand_image_left
+            return
+        if self.orientation == "right":
+            self.image = Player.right_images[self.phase]
+            self.phase += 1
+            self.phase %= 4
+        elif self.orientation == "left":
+            self.image = Player.left_images[self.phase]
+            self.phase += 1
+            self.phase %= 4
 
     def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
