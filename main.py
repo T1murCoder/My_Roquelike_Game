@@ -9,7 +9,7 @@ import pygame
 
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Moving Game')
+pygame.display.set_caption('Roquelike Game')
 clock = pygame.time.Clock()
 
 
