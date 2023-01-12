@@ -131,17 +131,37 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    image = pygame.Surface((30, 50))
-    pygame.draw.rect(image, pygame.Color("red"), (0, 0, 30, 50))
+    stand_image_right = load_image("enemy/enemy-stand_R.png")
+    stand_image_left = pygame.transform.flip(load_image("enemy/enemy-stand_R.png"), True, False)
+    right_images = [load_image("enemy/enemy-walk_1_R.png"),
+                    load_image("enemy/enemy-walk_2_R.png"),
+                    load_image("enemy/enemy-walk_3_R.png"),
+                    load_image("enemy/enemy-walk_4_R.png")]
+    left_images = [pygame.transform.flip(elem, True, False) for elem in right_images]
+    # image = pygame.Surface((30, 50))
+    # pygame.draw.rect(image, pygame.Color("red"), (0, 0, 30, 50))
 
     def __init__(self, x, y, health, *group):
         super().__init__(*group)
-        self.image = Enemy.image
+        self.image = Enemy.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.speed = 5
+        self.phase = 0
+        self.orientation = ""
+        self.get_orientation()
         self.health = health
+
+    def get_orientation(self):
+        x_diff = player.rect.x - self.rect.x
+        y_diff = player.rect.y - self.rect.y
+        angle = math.atan2(y_diff, x_diff)
+        x_movement = int(math.cos(angle) * self.speed)
+        if x_movement > 0:
+            self.orientation = "right"
+        else:
+            self.orientation = "left"
 
     def move(self):
         # Calculate the direction
@@ -152,8 +172,27 @@ class Enemy(pygame.sprite.Sprite):
         y_movement = int(math.sin(angle) * self.speed)
         self.rect = self.rect.move(x_movement, y_movement)
 
+    def change_phase(self, reset=False):
+        if reset:
+            self.phase = 0
+            if self.orientation == "right":
+                self.image = Enemy.stand_image_right
+            else:
+                self.image = Enemy.stand_image_left
+            return
+        if self.orientation == "right":
+            self.image = Enemy.right_images[self.phase]
+            self.phase += 1
+            self.phase %= 4
+        elif self.orientation == "left":
+            self.image = Enemy.left_images[self.phase]
+            self.phase += 1
+            self.phase %= 4
+
     def update(self, *args):
         self.move()
+        self.get_orientation()
+        self.change_phase()
         if self.health == 0:
             self.kill()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
@@ -264,8 +303,8 @@ class AllSpritesGroup(pygame.sprite.Group):
 
 def spawn_enemies(count):
     for i in range(count):
-        enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
-        enemy_y = random.randint(10, height - Enemy.image.get_rect()[3] - 10)
+        enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
+        enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
         enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
         while pygame.sprite.spritecollideany(enemy, player_sprite):
             enemy.kill()
