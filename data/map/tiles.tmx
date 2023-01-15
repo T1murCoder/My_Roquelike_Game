@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="100" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" source="../../../../Downloads/kenney_tinydungeon/Tiled/sampleSheet.tsx"/>
+ <layer id="1" name="Слой тайлов 1" width="100" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztmktywyAMhulz2Wm77GvfZdNpz8PRfJQerTiNG0KMkbEEEuif+ScPxw7WF0FAGDOvi1MPzj8rXeKck3a2LOXBS9M9XjpfMfa16YvHnfO759fgdWj/+BvwcxDHPn9vuuEx9h1DyIObDzz2/RdVLDjI5/FljP10jxx94GFHkwWDgXwe7r7th3vk6J557Mx5PObeW+st1+iZB3Vsc66tPGCx3yWOa3+1TtD+qlQeKA+a8Rybac88/FiGcc2JM8Y5PfPgaOWBlwcYfVfvPKAxxOiLINfoiMf/eiK3/srn1BqPsIYQeuKBNTcn+n8VrYlIW/eF8qjx21/Bw3oWzSNV73k023hQzyEfAPcgSbF6z/h6qifljOelHKtZ+c8lCVLzyVm/KpUzkPZLEqTm823q50HMkPZLUu145uZUKsf845IUuw+M9alarML3JYlTvKnaIEnPCd+a/fhha7OK+QZwD5IUmQcOW9cTS+Vba/NBKh6l3BqPmJZ4cBhr5niQBYOBsOvnVAx73J/IZb+P5kfd8UPrUUdx4KH5cVRpHrn9XO88IHHDqCVCv6d3Hti/b+2vYKq5X1R5nKvE+IGxd0h50MRc82NZOh/kpZBHrf3TyuNPpfdf6fxjWROPJ5Ou99T0i9fWlpXat5jwbB2C+pyWpTxUKpVKpZKjXwzazfM=
+  </data>
+ </layer>
+</map>

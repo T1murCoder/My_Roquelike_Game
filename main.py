@@ -6,6 +6,7 @@ import os
 import sys
 
 import pygame
+import pytmx
 
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -28,6 +29,34 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+class Level:
+    def __init__(self, filename):
+        self.map = pytmx.load_pygame(f"data/map/{filename}")
+        self.width = self.map.width
+        self.height = self.map.height
+        self.tile_size = self.map.tilewidth
+        self.create_tile_sprites()
+
+    def create_tile_sprites(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                image = self.map.get_tile_image(x, y, 0)
+                if image:
+                    # TODO: Сделать разделение тайлов на стенки и землю
+                    pos_x = x * self.tile_size
+                    pos_y = y * self.tile_size
+                    Tile(image, pos_x, pos_y, level_sprites)
+
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, image, x, y, *group):
+        super().__init__(*group)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 class Player(pygame.sprite.Sprite):
@@ -308,8 +337,8 @@ def spawn_enemies(count):
         enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
         while pygame.sprite.spritecollideany(enemy, player_sprite):
             enemy.kill()
-            enemy_x = random.randint(10, width - Enemy.image.get_rect()[2] - 10)
-            enemy_y = random.randint(10, height - Enemy.image.get_rect()[3] - 10)
+            enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
+            enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
 
 
@@ -325,8 +354,12 @@ if __name__ == '__main__':
     enemies_sprites = pygame.sprite.Group()
     crosshair_sprite = pygame.sprite.Group()
 
+    level_sprites = pygame.sprite.Group()
+
     # create Camera
     camera = Camera()
+
+    level = Level("tiles.tmx")
 
     # create Crosshair
     Crosshair(crosshair_sprite)
@@ -361,7 +394,12 @@ if __name__ == '__main__':
         for sprite in all_sprites:
             camera.apply(sprite)
 
+        for sprite in level_sprites:
+            camera.apply(sprite)
+
         screen.fill(pygame.Color("black"))
+
+        level_sprites.draw(screen)
 
         all_sprites.update()
         all_sprites.draw(screen)
