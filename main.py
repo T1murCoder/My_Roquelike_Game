@@ -40,14 +40,25 @@ class Level:
         self.create_tile_sprites()
 
     def create_tile_sprites(self):
+
+        # пришлось расположить тайлы, которые отвечают за стенки на краю карты
+        walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
+
         for y in range(self.height):
             for x in range(self.width):
+
                 image = self.map.get_tile_image(x, y, 0)
+
                 if image:
-                    # TODO: Сделать разделение тайлов на стенки и землю
                     pos_x = x * self.tile_size
                     pos_y = y * self.tile_size
-                    Tile(image, pos_x, pos_y, level_sprites)
+
+                    gid = self.map.get_tile_gid(x, y, 0)
+                    if gid in walls_gids:
+                        pass
+                        Tile(image, pos_x, pos_y, [level_sprites, wall_sprites])
+                    else:
+                        Tile(image, pos_x, pos_y, level_sprites)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -87,21 +98,21 @@ class Player(pygame.sprite.Sprite):
         # Player movement
         if direction == "right":
             self.rect = self.rect.move(self.speed, 0)
-            if pygame.sprite.spritecollideany(self, borders_sprites):
+            if pygame.sprite.spritecollideany(self, wall_sprites):
                 self.rect = self.rect.move(-self.speed, 0)
             self.orientation = "right"
         elif direction == "left":
             self.rect = self.rect.move(-self.speed, 0)
-            if pygame.sprite.spritecollideany(self, borders_sprites):
+            if pygame.sprite.spritecollideany(self, wall_sprites):
                 self.rect = self.rect.move(self.speed, 0)
             self.orientation = "left"
         elif direction == "up":
             self.rect = self.rect.move(0, -self.speed)
-            if pygame.sprite.spritecollideany(self, borders_sprites):
+            if pygame.sprite.spritecollideany(self, wall_sprites):
                 self.rect = self.rect.move(0, self.speed)
         elif direction == "down":
             self.rect = self.rect.move(0, self.speed)
-            if pygame.sprite.spritecollideany(self, borders_sprites):
+            if pygame.sprite.spritecollideany(self, wall_sprites):
                 self.rect = self.rect.move(0, -self.speed)
 
     def input(self):
@@ -355,11 +366,12 @@ if __name__ == '__main__':
     crosshair_sprite = pygame.sprite.Group()
 
     level_sprites = pygame.sprite.Group()
+    wall_sprites = pygame.sprite.Group()
 
     # create Camera
     camera = Camera()
 
-    level = Level("tiles.tmx")
+    level = Level("map.tmx")
 
     # create Crosshair
     Crosshair(crosshair_sprite)
