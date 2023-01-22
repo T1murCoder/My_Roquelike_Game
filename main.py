@@ -294,7 +294,27 @@ class Bullet(pygame.sprite.Sprite):
 
 class Gun(pygame.sprite.Sprite):
     # TODO: Дать игроку пушку в руки
-    pass
+    # image = pygame.surface.Surface((30, 20))
+    # pygame.draw.rect(image, pygame.Color("grey"), (0, 0, 30, 20))
+    # TODO: Найти нормальный спрайт
+    image = load_image("guns/assault_riffle.png")
+
+    def __init__(self, x, y, *group):
+        super().__init__(*group)
+        self.image = Gun.image
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.centery = y
+
+    def rotate(self):
+        pass
+
+    def set_pos(self):
+        self.rect.centerx = player.rect.right
+        self.rect.centery = player.rect.centery + 10
+
+    def update(self):
+        self.set_pos()
 
 
 class Border(pygame.sprite.Sprite):
@@ -372,6 +392,7 @@ def spawn_enemies(count):
 
 if __name__ == '__main__':
     fps = 30
+    # TODO: Сделать скорость передвижение не зависящую от fps
 
     pygame.mouse.set_visible(False)
 
@@ -381,6 +402,7 @@ if __name__ == '__main__':
     bullet_sprites = pygame.sprite.Group()
     enemies_sprites = pygame.sprite.Group()
     crosshair_sprite = pygame.sprite.Group()
+    gun_sprites = pygame.sprite.Group()
 
     level_sprites = pygame.sprite.Group()
     wall_sprites = pygame.sprite.Group()
@@ -395,6 +417,7 @@ if __name__ == '__main__':
 
     # create Player
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
+    Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
 
     # create Borders
     Border("left", [all_sprites, borders_sprites])
@@ -426,12 +449,18 @@ if __name__ == '__main__':
         for sprite in level_sprites:
             camera.apply(sprite)
 
+        # for sprite in gun_sprites:
+        #     camera.apply(sprite)
+
         screen.fill(pygame.Color("black"))
 
         level_sprites.draw(screen)
 
         all_sprites.update()
         all_sprites.draw(screen)
+
+        gun_sprites.update()
+        gun_sprites.draw(screen)
 
         crosshair_sprite.update()
         crosshair_sprite.draw(screen)
