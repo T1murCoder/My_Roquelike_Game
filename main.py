@@ -187,6 +187,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.vision_range = 500
         self.speed = 5
         self.phase = 0
         self.orientation = ""
@@ -229,10 +230,21 @@ class Enemy(pygame.sprite.Sprite):
             self.phase += 1
             self.phase %= 4
 
+    def get_distance_to_player(self):
+        x_range = abs(self.rect.centerx) - abs(player.rect.centerx)
+        y_range = abs(self.rect.centery) - abs(player.rect.centery)
+        distance = round((x_range ** 2 + y_range ** 2) ** 0.5)
+        return distance
+
     def update(self, *args):
-        self.move()
-        self.get_orientation()
-        self.change_phase()
+        distance = self.get_distance_to_player()
+        if distance <= self.vision_range:
+            self.move()
+            self.get_orientation()
+            self.change_phase()
+        else:
+            self.get_orientation()
+            self.change_phase(reset=True)
         if self.health == 0:
             self.kill()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
@@ -278,6 +290,11 @@ class Bullet(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
         self.move()
+
+
+class Gun(pygame.sprite.Sprite):
+    # TODO: Дать игроку пушку в руки
+    pass
 
 
 class Border(pygame.sprite.Sprite):
