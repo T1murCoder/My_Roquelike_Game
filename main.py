@@ -190,7 +190,7 @@ class Enemy(pygame.sprite.Sprite):
         self.vision_range = 500
         self.speed = 5
         self.phase = 0
-        self.orientation = ""
+        self.orientation = "right"
         self.get_orientation()
         self.health = health
 
@@ -293,7 +293,6 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Gun(pygame.sprite.Sprite):
-    # TODO: Дать игроку пушку в руки
     # image = pygame.surface.Surface((30, 20))
     # pygame.draw.rect(image, pygame.Color("grey"), (0, 0, 30, 20))
     # TODO: Найти нормальный спрайт
@@ -302,18 +301,39 @@ class Gun(pygame.sprite.Sprite):
     def __init__(self, x, y, *group):
         super().__init__(*group)
         self.image = Gun.image
+        self.orig_image = Gun.image
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.centery = y
 
     def rotate(self):
-        pass
+        x, y = self.rect.center
+
+        direction = pygame.mouse.get_pos() - pygame.Vector2(x, y)
+        radius, angle = direction.as_polar()
+        if player.orientation == "right":
+            self.image = pygame.transform.rotate(self.orig_image, -angle)
+        else:
+            self.image = pygame.transform.flip(pygame.transform.rotate(self.orig_image, -angle), True, True)
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+    def flip(self):
+        if player.orientation == "right":
+            self.orig_image = Gun.image
+        else:
+            self.orig_image = pygame.transform.flip(Gun.image, True, False)
 
     def set_pos(self):
-        self.rect.centerx = player.rect.right
-        self.rect.centery = player.rect.centery + 10
+        if player.orientation == "right":
+            self.rect.centerx = player.rect.right
+            self.rect.centery = player.rect.centery + 10
+        else:
+            self.rect.centerx = player.rect.left - 10
+            self.rect.centery = player.rect.centery + 10
 
     def update(self):
+        self.flip()
+        self.rotate()
         self.set_pos()
 
 
@@ -420,10 +440,10 @@ if __name__ == '__main__':
     Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
 
     # create Borders
-    Border("left", [all_sprites, borders_sprites])
-    Border("right", [all_sprites, borders_sprites])
-    Border("up", [all_sprites, borders_sprites])
-    Border("down", [all_sprites, borders_sprites])
+    # Border("left", [all_sprites, borders_sprites])
+    # Border("right", [all_sprites, borders_sprites])
+    # Border("up", [all_sprites, borders_sprites])
+    # Border("down", [all_sprites, borders_sprites])
 
     spawn_enemies(5)
 
