@@ -40,7 +40,6 @@ class Level:
         self.create_tile_sprites()
 
     def create_tile_sprites(self):
-
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
         walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
 
@@ -81,8 +80,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, x, y, *group):
         super().__init__(*group)
-        # self.image = pygame.Surface((30, 50))
-        # pygame.draw.rect(self.image, pygame.Color("blue"), (0, 0, 30, 50))
+        # TODO: Сделать хп игроку и их снятие (+ кадры неуязвимости)
         self.image = Player.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -296,6 +294,7 @@ class Gun(pygame.sprite.Sprite):
     # image = pygame.surface.Surface((30, 20))
     # pygame.draw.rect(image, pygame.Color("grey"), (0, 0, 30, 20))
     # TODO: Найти нормальный спрайт
+    # TODO: Расположить спрайт так чтобы пули спавнились также, но вылетали как будто из ствола
     image = load_image("guns/assault_riffle.png")
 
     def __init__(self, x, y, *group):
@@ -415,6 +414,8 @@ if __name__ == '__main__':
     # TODO: Сделать скорость передвижение не зависящую от fps
 
     pygame.mouse.set_visible(False)
+
+    game_stage = "menu"
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
