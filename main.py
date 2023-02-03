@@ -8,6 +8,8 @@ import sys
 import pygame
 import pytmx
 
+from menu import create_menu, Menu
+
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Roquelike Game')
@@ -283,7 +285,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.rect.move(x_movement, y_movement)
 
     def update(self, *args):
-        if pygame.sprite.spritecollideany(self, borders_sprites):
+        if pygame.sprite.spritecollideany(self, wall_sprites):
             self.kill()
         if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
@@ -336,6 +338,7 @@ class Gun(pygame.sprite.Sprite):
         self.set_pos()
 
 
+# TODO: Убрать класс Border
 class Border(pygame.sprite.Sprite):
     def __init__(self, side, *group):
         super().__init__(*group)
@@ -415,7 +418,9 @@ if __name__ == '__main__':
 
     pygame.mouse.set_visible(False)
 
-    game_stage = "menu"
+    create_menu()
+
+    game_stage = "game"
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
