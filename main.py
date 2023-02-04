@@ -413,18 +413,49 @@ def spawn_enemies(count):
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
 
 
+def menu_scene():
+    create_menu()
+
+
+def loading_scene():
+
+    # TODO: Сделать логотип и надпись)
+
+    WORK = 150
+
+    # load background image
+    loading_bg_image = load_image("loading/loading_bar_background.png")
+    loading_bg_rect = loading_bg_image.get_rect(center=(640, 360))
+
+    # load bar image
+    loading_bar_image = load_image("loading/loading_bar.png")
+    loading_bar_rect = loading_bar_image.get_rect(midleft=(280, 360))
+
+    for i in range(WORK):
+        screen.fill("#0d0e2e")
+
+        loading_bar_width = i / WORK * 720
+
+        loading_bar_image_resized = pygame.transform.scale(loading_bar_image, (int(loading_bar_width), 165))
+
+        screen.blit(loading_bg_image, loading_bg_rect)
+        screen.blit(loading_bar_image_resized, loading_bar_rect)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+
 if __name__ == '__main__':
     fps = 30
     # TODO: Сделать скорость передвижение не зависящую от fps
 
     pygame.mouse.set_visible(False)
 
-    create_menu()
+    loading_scene()
+    menu_scene()
 
-    game_stage = "game"
-
-    # TODO: добавить сцены в игру
     # TODO: Добавить файл с конфигом?
+    # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -448,12 +479,6 @@ if __name__ == '__main__':
     # create Player
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
     Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
-
-    # create Borders
-    # Border("left", [all_sprites, borders_sprites])
-    # Border("right", [all_sprites, borders_sprites])
-    # Border("up", [all_sprites, borders_sprites])
-    # Border("down", [all_sprites, borders_sprites])
 
     spawn_enemies(5)
 
@@ -496,3 +521,4 @@ if __name__ == '__main__':
         crosshair_sprite.draw(screen)
 
         pygame.display.flip()
+    pygame.quit()

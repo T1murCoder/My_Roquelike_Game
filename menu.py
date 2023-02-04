@@ -61,7 +61,7 @@ def create_menu():
                 elif event.key == pygame.K_SPACE:
                     menu.select()
 
-        screen.fill((0, 0, 0))
+        screen.fill("#0d0e2e")
         menu.draw(screen, 100, 100, 50)
 
         pygame.display.flip()
