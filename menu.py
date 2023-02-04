@@ -13,26 +13,26 @@ class Menu:
     def __init__(self):
         self.option_surfaces = []
         self.functions = []
-        self.current_index = 0
+        self.current_option_index = 0
 
     def append_option(self, option, function):
         self.option_surfaces.append(FONT.render(option, True, (100, 255, 100)))
         self.functions.append(function)
 
     def switch(self, direction):
-        self.current_index += direction
-        self.current_index %= len(self.option_surfaces)
-        if self.current_index < 0:
-            self.current_index = len(self.option_surfaces) - 1
+        self.current_option_index += direction
+        self.current_option_index %= len(self.option_surfaces)
+        if self.current_option_index < 0:
+            self.current_option_index = len(self.option_surfaces) - 1
 
     def select(self):
-        self.functions[self.current_index]()
+        self.functions[self.current_option_index]()
 
     def draw(self, surface, x, y, y_padding):
         for i, option in enumerate(self.option_surfaces):
             option_rect = option.get_rect()
             option_rect.topleft = (x, y + i * y_padding)
-            if i == self.current_index:
+            if i == self.current_option_index:
                 pygame.draw.rect(surface, (0, 100, 0), option_rect)
             surface.blit(option, option_rect)
 
@@ -47,7 +47,7 @@ def create_menu():
 
     menu = Menu()
     menu.append_option("Play", lambda: start_game())
-    menu.append_option("Quit", lambda: print("Quit"))
+    menu.append_option("Quit", lambda: sys.exit(0))
 
     while menu_running:
         for event in pygame.event.get():

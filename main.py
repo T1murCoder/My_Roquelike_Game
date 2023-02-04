@@ -83,6 +83,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, *group):
         super().__init__(*group)
         # TODO: Сделать хп игроку и их снятие (+ кадры неуязвимости)
+        # TODO: Графические отрисовывать хп
         self.image = Player.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -421,6 +422,9 @@ if __name__ == '__main__':
     create_menu()
 
     game_stage = "game"
+
+    # TODO: добавить сцены в игру
+    # TODO: Добавить файл с конфигом?
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
