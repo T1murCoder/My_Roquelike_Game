@@ -317,18 +317,24 @@ class Gun(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def flip(self):
-        # TODO: Сделать привязку к курсору а не к повороту игрока
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         if player.orientation == "right":
-            self.orig_image = Gun.image
+            if mouse_x >= self.rect.centerx:
+                self.orig_image = Gun.image
+            else:
+                self.orig_image = pygame.transform.flip(Gun.image, False, True)
         else:
-            self.orig_image = pygame.transform.flip(Gun.image, True, False)
+            if mouse_x >= self.rect.centerx:
+                self.orig_image = pygame.transform.flip(Gun.image, True, True)
+            else:
+                self.orig_image = pygame.transform.flip(Gun.image, True, False)
 
     def set_pos(self):
         if player.orientation == "right":
-            self.rect.centerx = player.rect.centerx + 25
+            self.rect.centerx = player.rect.centerx - 15
             self.rect.centery = player.rect.centery + 15
         else:
-            self.rect.centerx = player.rect.centerx - 25
+            self.rect.centerx = player.rect.centerx + 15
             self.rect.centery = player.rect.centery + 15
 
     def update(self):
