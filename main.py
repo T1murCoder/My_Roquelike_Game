@@ -506,6 +506,10 @@ def loading_scene():
         clock.tick(60)
 
 
+def game_over_scene():
+    pass
+
+
 if __name__ == '__main__':
     fps = 30
     # TODO: Сделать скорость передвижение не зависящую от fps
