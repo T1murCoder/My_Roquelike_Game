@@ -80,6 +80,10 @@ class Player(pygame.sprite.Sprite):
                     load_image("hero/hero-walk_4_R.png")]
     left_images = [pygame.transform.flip(elem, True, False) for elem in right_images]
 
+    heart_image = load_image("interface/heart.png")
+    half_heart_image = load_image("interface/half_heart.png")
+    no_heart_image = load_image("interface/no_heart.png")
+
     def __init__(self, x, y, *group):
         super().__init__(*group)
         # TODO: Сделать хп игроку и их снятие (+ кадры неуязвимости)
@@ -94,6 +98,8 @@ class Player(pygame.sprite.Sprite):
         self.ready_to_shoot = True
         self.fire_cooldown = 7
         self.time_gone_from_shot = 0
+        self.max_hp = 6
+        self.current_hp = 6
 
     def move(self, direction):
         # Player movement
@@ -162,8 +168,36 @@ class Player(pygame.sprite.Sprite):
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
 
+    def draw_hp(self):
+        heart_x = 10
+        heart_y = 10
+        heart_image_width = Player.heart_image.get_width()
+        full_hearts = self.current_hp // 2
+        max_hearts = self.max_hp // 2
+        half_heart = (self.max_hp - self.current_hp) % 2
+        no_hearts = max_hearts - half_heart - full_hearts
+        print(full_hearts, max_hearts, half_heart, no_hearts)
+        for i in range(max_hearts):
+            screen.blit(Player.no_heart_image, (heart_x, heart_y))
+            heart_x += 10 + heart_image_width
+        heart_x = 10
+        if full_hearts:
+            for i in range(full_hearts):
+                screen.blit(Player.heart_image, (heart_x, heart_y))
+                heart_x += 10 + heart_image_width
+        else:
+            # TODO: Сделать проигрыш
+            pass
+        if half_heart:
+            screen.blit(Player.half_heart_image, (heart_x, heart_y))
+        if no_hearts:
+            for i in range(no_hearts):
+                screen.blit(Player.no_heart_image, (heart_x, heart_y))
+                heart_x += 10 + heart_image_width
+
     def update(self, *args):
         self.input()
+        self.draw_hp()
         if not self.ready_to_shoot:
             self.time_gone_from_shot += 1
             if self.time_gone_from_shot == self.fire_cooldown:
@@ -471,6 +505,8 @@ if __name__ == '__main__':
 
     level_sprites = pygame.sprite.Group()
     wall_sprites = pygame.sprite.Group()
+
+    interface_sprites = pygame.sprite.Group()
 
     # create Camera
     camera = Camera()
