@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, *group):
         super().__init__(*group)
         # TODO: Сделать хп игроку и их снятие (+ кадры неуязвимости)
-        # TODO: Графические отрисовывать хп
+        # TODO: Графически отрисовывать хп
         self.image = Player.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -425,7 +425,7 @@ def loading_scene():
 
     # TODO: Сделать логотип и надпись)
 
-    WORK = 150
+    WORK = 100
 
     # load background image
     loading_bg_image = load_image("loading/loading_bar_background.png")
