@@ -86,8 +86,6 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, x, y, *group):
         super().__init__(*group)
-        # TODO: Сделать хп игроку и их снятие (+ кадры неуязвимости)
-        # TODO: Графически отрисовывать хп
         self.image = Player.stand_image_right
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -98,8 +96,11 @@ class Player(pygame.sprite.Sprite):
         self.ready_to_shoot = True
         self.fire_cooldown = 7
         self.time_gone_from_shot = 0
-        self.max_hp = 6
-        self.current_hp = 6
+        self.max_hp = 8
+        self.current_hp = 8
+        self.invincibility_frames = 15
+        self.current_invincibility_frame = 0
+        self.ready_to_take_damage = True
 
     def move(self, direction):
         # Player movement
@@ -176,26 +177,38 @@ class Player(pygame.sprite.Sprite):
         max_hearts = self.max_hp // 2
         half_heart = (self.max_hp - self.current_hp) % 2
         no_hearts = max_hearts - half_heart - full_hearts
-        print(full_hearts, max_hearts, half_heart, no_hearts)
         for i in range(max_hearts):
             screen.blit(Player.no_heart_image, (heart_x, heart_y))
             heart_x += 10 + heart_image_width
-        heart_x = 10
-        if full_hearts:
-            for i in range(full_hearts):
-                screen.blit(Player.heart_image, (heart_x, heart_y))
-                heart_x += 10 + heart_image_width
-        else:
-            # TODO: Сделать проигрыш
-            pass
-        if half_heart:
-            screen.blit(Player.half_heart_image, (heart_x, heart_y))
-        if no_hearts:
-            for i in range(no_hearts):
-                screen.blit(Player.no_heart_image, (heart_x, heart_y))
-                heart_x += 10 + heart_image_width
+        if self.current_hp > 0:
+            heart_x = 10
+            if full_hearts:
+                for i in range(full_hearts):
+                    screen.blit(Player.heart_image, (heart_x, heart_y))
+                    heart_x += 10 + heart_image_width
+            if half_heart:
+                screen.blit(Player.half_heart_image, (heart_x, heart_y))
+            if no_hearts:
+                for i in range(no_hearts):
+                    screen.blit(Player.no_heart_image, (heart_x, heart_y))
+                    heart_x += 10 + heart_image_width
+
+    def get_damage(self):
+        if self.ready_to_take_damage:
+            self.current_hp -= 1
+            if self.current_hp < 0:
+                self.current_hp = 0
+            self.ready_to_take_damage = False
+
+    def get_heal(self):
+        self.current_hp += 1
+        if self.current_hp > self.max_hp:
+            self.current_hp = self.max_hp
 
     def update(self, *args):
+        if self.current_hp == 0:
+            # TODO: Сделать проигрыш
+            pass
         self.input()
         self.draw_hp()
         if not self.ready_to_shoot:
@@ -203,6 +216,11 @@ class Player(pygame.sprite.Sprite):
             if self.time_gone_from_shot == self.fire_cooldown:
                 self.ready_to_shoot = True
                 self.time_gone_from_shot = 0
+        if not self.ready_to_take_damage:
+            self.current_invincibility_frame += 1
+            if self.current_invincibility_frame == self.invincibility_frames:
+                self.current_invincibility_frame = 0
+                self.ready_to_take_damage = True
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -271,6 +289,10 @@ class Enemy(pygame.sprite.Sprite):
         distance = round((x_range ** 2 + y_range ** 2) ** 0.5)
         return distance
 
+    def check_hit_player(self):
+        if pygame.sprite.spritecollideany(self, player_sprite):
+            player.get_damage()
+
     def update(self, *args):
         distance = self.get_distance_to_player()
         if distance <= self.vision_range:
@@ -284,6 +306,7 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
             self.health -= 1
+        self.check_hit_player()
 
 
 class Bullet(pygame.sprite.Sprite):
