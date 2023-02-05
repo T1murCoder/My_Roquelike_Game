@@ -157,8 +157,8 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, mouse_x, mouse_y):
         if self.ready_to_shoot:
             # Spawn bullet
-            bullet_x = self.rect.centerx
-            bullet_y = self.rect.centery
+            bullet_x = player_gun.rect.centerx
+            bullet_y = player_gun.rect.centery
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
 
@@ -294,11 +294,8 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Gun(pygame.sprite.Sprite):
-    # image = pygame.surface.Surface((30, 20))
-    # pygame.draw.rect(image, pygame.Color("grey"), (0, 0, 30, 20))
-    # TODO: Найти нормальный спрайт
-    # TODO: Расположить спрайт так чтобы пули спавнились также, но вылетали как будто из ствола
-    image = load_image("guns/assault_riffle.png")
+    image = load_image("guns/player_gun.png", (255, 255, 255))
+    image = pygame.transform.flip(image, True, False)
 
     def __init__(self, x, y, *group):
         super().__init__(*group)
@@ -320,6 +317,7 @@ class Gun(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def flip(self):
+        # TODO: Сделать привязку к курсору а не к повороту игрока
         if player.orientation == "right":
             self.orig_image = Gun.image
         else:
@@ -327,11 +325,11 @@ class Gun(pygame.sprite.Sprite):
 
     def set_pos(self):
         if player.orientation == "right":
-            self.rect.centerx = player.rect.right
-            self.rect.centery = player.rect.centery + 10
+            self.rect.centerx = player.rect.centerx + 25
+            self.rect.centery = player.rect.centery + 15
         else:
-            self.rect.centerx = player.rect.left - 10
-            self.rect.centery = player.rect.centery + 10
+            self.rect.centerx = player.rect.centerx - 25
+            self.rect.centery = player.rect.centery + 15
 
     def update(self):
         self.flip()
@@ -478,7 +476,7 @@ if __name__ == '__main__':
 
     # create Player
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
-    Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
+    player_gun = Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
 
     spawn_enemies(5)
 
