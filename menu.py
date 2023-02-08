@@ -39,6 +39,7 @@ class Menu:
 
 def create_menu():
     # TODO: Сделать изображение для меню
+    # TODO: Добавить settings
     menu_running = True
 
     def start_game():

@@ -513,7 +513,6 @@ def loading_scene():
 
 
 def game_over_scene():
-    # TODO: Сделать проигрыш
     game_over_image = load_image("menu_bgs/game_over.png")
 
     game_over_running = True
@@ -531,8 +530,10 @@ def game_over_scene():
 if __name__ == '__main__':
     fps = 30
     # TODO: Сделать скорость передвижение не зависящую от fps
-
     pygame.mouse.set_visible(False)
+
+    # TODO: Сделать ресайз
+    # TODO: Сделать скины?)
 
     loading_scene()
     menu_scene()
