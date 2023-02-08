@@ -207,8 +207,9 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, *args):
         if self.current_hp == 0:
-            # TODO: Сделать проигрыш
-            pass
+            global running, game_over
+            running = False
+            game_over = True
         self.input()
         self.draw_hp()
         if not self.ready_to_shoot:
@@ -334,6 +335,7 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 15
 
     def move(self):
+        # TODO: Оптимизировать
         # Calculate the direction
         x_diff = self.mouse_x - self.spawn_x
         y_diff = self.mouse_y - self.spawn_y
@@ -484,6 +486,8 @@ def loading_scene():
 
     WORK = 100
 
+    game_logo_image = pygame.transform.scale(load_image("loading/game_logo.png"), (200, 200))
+
     # load background image
     loading_bg_image = load_image("loading/loading_bar_background.png")
     loading_bg_rect = loading_bg_image.get_rect(center=(640, 360))
@@ -501,13 +505,27 @@ def loading_scene():
 
         screen.blit(loading_bg_image, loading_bg_rect)
         screen.blit(loading_bar_image_resized, loading_bar_rect)
+        screen.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
+                                      height - 20 - game_logo_image.get_height()))
 
         pygame.display.flip()
         clock.tick(60)
 
 
 def game_over_scene():
-    pass
+    # TODO: Сделать проигрыш
+    game_over_image = load_image("menu_bgs/game_over.png")
+
+    game_over_running = True
+    while game_over_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over_running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    game_over_running = False
+        screen.blit(game_over_image, (0, 0))
+        pygame.display.flip()
 
 
 if __name__ == '__main__':
@@ -549,6 +567,8 @@ if __name__ == '__main__':
 
     spawn_enemies(5)
 
+    game_over = False
+
     running = True
     while running:
         clock.tick(fps)
@@ -588,4 +608,8 @@ if __name__ == '__main__':
         crosshair_sprite.draw(screen)
 
         pygame.display.flip()
+
+    if game_over:
+        game_over_scene()
+
     pygame.quit()
