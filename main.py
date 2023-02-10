@@ -8,7 +8,7 @@ import sys
 import pygame
 import pytmx
 
-from menu import create_menu, Menu
+from menu import create_menu
 
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -265,6 +265,7 @@ class Enemy(pygame.sprite.Sprite):
         angle = math.atan2(y_diff, x_diff)
         x_movement = int(math.cos(angle) * self.speed)
         y_movement = int(math.sin(angle) * self.speed)
+        # TODO: Сделать так чтобы враги не могли ходить сквозь стены, для этого отдельно двигаем по x, и по y
         self.rect = self.rect.move(x_movement, y_movement)
 
     def change_phase(self, reset=False):
@@ -537,6 +538,9 @@ if __name__ == '__main__':
 
     loading_scene()
     menu_scene()
+
+    # TODO: Сделать арену на выживание
+    # TODO: Сделать дроп хпшек
 
     # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
