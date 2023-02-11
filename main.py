@@ -8,7 +8,7 @@ import sys
 import pygame
 import pytmx
 
-from menu import create_menu
+from menu import menu_scene, loading_scene, game_over_scene
 
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -475,57 +475,6 @@ def spawn_enemies(count):
             enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
             enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
-
-
-def menu_scene():
-    create_menu()
-
-
-def loading_scene():
-
-    # TODO: Сделать логотип и надпись)
-
-    WORK = 100
-
-    game_logo_image = pygame.transform.scale(load_image("loading/game_logo.png"), (200, 200))
-
-    # load background image
-    loading_bg_image = load_image("loading/loading_bar_background.png")
-    loading_bg_rect = loading_bg_image.get_rect(center=(640, 360))
-
-    # load bar image
-    loading_bar_image = load_image("loading/loading_bar.png")
-    loading_bar_rect = loading_bar_image.get_rect(midleft=(280, 360))
-
-    for i in range(WORK):
-        screen.fill("#0d0e2e")
-
-        loading_bar_width = i / WORK * 720
-
-        loading_bar_image_resized = pygame.transform.scale(loading_bar_image, (int(loading_bar_width), 165))
-
-        screen.blit(loading_bg_image, loading_bg_rect)
-        screen.blit(loading_bar_image_resized, loading_bar_rect)
-        screen.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
-                                      height - 20 - game_logo_image.get_height()))
-
-        pygame.display.flip()
-        clock.tick(60)
-
-
-def game_over_scene():
-    game_over_image = load_image("menu_bgs/game_over.png")
-
-    game_over_running = True
-    while game_over_running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over_running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    game_over_running = False
-        screen.blit(game_over_image, (0, 0))
-        pygame.display.flip()
 
 
 if __name__ == '__main__':
