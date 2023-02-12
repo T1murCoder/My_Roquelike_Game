@@ -486,7 +486,7 @@ if __name__ == '__main__':
     # TODO: Сделать скины?)
 
     loading_scene()
-    menu_scene()
+    game_settings = menu_scene()
 
     # TODO: Сделать арену на выживание
     # TODO: Сделать дроп хпшек
