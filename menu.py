@@ -57,8 +57,8 @@ def load_image(name, colorkey=None):
 
 
 def menu_scene():
-    # TODO: Сделать изображение для меню
-    # TODO: Добавить settings (Тут должно быть разрешение экрана
+    hints_image = load_image("menu/controls_hint.png")
+
     menu_running = True
 
     current_page = "main"
@@ -132,7 +132,9 @@ def menu_scene():
             menu_main_page.draw(screen, 100, 100, 50)
         else:
             menu_settings_page.draw(screen, 100, 100, 50)
-            #print(f"Fullscreen - {fullscreen_toggled}, Sound - {sound_toggled}")
+            # print(f"Fullscreen - {fullscreen_toggled}, Sound - {sound_toggled}")
+
+        screen.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
         pygame.display.flip()
     return {"Fullscreen_toggled": fullscreen_toggled, "Sound_toggled": sound_toggled}
@@ -140,11 +142,11 @@ def menu_scene():
 
 def loading_scene():
     CLOCK = pygame.time.Clock()
-    # TODO: Сделать надпись
 
     WORK = 100
 
     game_logo_image = pygame.transform.scale(load_image("loading/game_logo.png"), (200, 200))
+    game_name_image = load_image("loading/roquelike-game.png")
 
     # load background image
     loading_bg_image = load_image("loading/loading_bar_background.png")
@@ -165,6 +167,9 @@ def loading_scene():
         screen.blit(loading_bar_image_resized, loading_bar_rect)
         screen.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
                                       height - 20 - game_logo_image.get_height()))
+
+        screen.blit(game_name_image, (width // 2 - game_name_image.get_width() // 2,
+                                      height // 2 - game_name_image.get_height() - 100))
 
         pygame.display.flip()
         CLOCK.tick(60)
