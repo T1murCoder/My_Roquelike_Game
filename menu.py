@@ -56,7 +56,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def menu_scene():
+def menu_scene(surface):
     hints_image = load_image("menu/controls_hint.png")
 
     menu_running = True
@@ -127,20 +127,20 @@ def menu_scene():
                     elif event.key == pygame.K_SPACE:
                         menu_settings_page.select()
 
-        screen.fill("#0d0e2e")
+        surface.fill("#0d0e2e")
         if current_page == "main":
-            menu_main_page.draw(screen, 100, 100, 50)
+            menu_main_page.draw(surface, 100, 100, 50)
         else:
-            menu_settings_page.draw(screen, 100, 100, 50)
+            menu_settings_page.draw(surface, 100, 100, 50)
             # print(f"Fullscreen - {fullscreen_toggled}, Sound - {sound_toggled}")
 
-        screen.blit(hints_image, (50, height - 25 - hints_image.get_height()))
+        surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
         pygame.display.flip()
     return {"Fullscreen_toggled": fullscreen_toggled, "Sound_toggled": sound_toggled}
 
 
-def loading_scene():
+def loading_scene(surface):
     CLOCK = pygame.time.Clock()
 
     WORK = 100
@@ -157,25 +157,25 @@ def loading_scene():
     loading_bar_rect = loading_bar_image.get_rect(midleft=(280, 360))
 
     for i in range(WORK):
-        screen.fill("#0d0e2e")
+        surface.fill("#0d0e2e")
 
         loading_bar_width = i / WORK * 720
 
         loading_bar_image_resized = pygame.transform.scale(loading_bar_image, (int(loading_bar_width), 165))
 
-        screen.blit(loading_bg_image, loading_bg_rect)
-        screen.blit(loading_bar_image_resized, loading_bar_rect)
-        screen.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
+        surface.blit(loading_bg_image, loading_bg_rect)
+        surface.blit(loading_bar_image_resized, loading_bar_rect)
+        surface.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
                                       height - 20 - game_logo_image.get_height()))
 
-        screen.blit(game_name_image, (width // 2 - game_name_image.get_width() // 2,
+        surface.blit(game_name_image, (width // 2 - game_name_image.get_width() // 2,
                                       height // 2 - game_name_image.get_height() - 100))
 
         pygame.display.flip()
         CLOCK.tick(60)
 
 
-def game_over_scene():
+def game_over_scene(surface):
     game_over_image = load_image("menu_bgs/game_over.png")
 
     game_over_running = True
@@ -186,5 +186,5 @@ def game_over_scene():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     game_over_running = False
-        screen.blit(game_over_image, (0, 0))
+        surface.blit(game_over_image, (0, 0))
         pygame.display.flip()

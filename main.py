@@ -12,7 +12,6 @@ from menu import menu_scene, loading_scene, game_over_scene
 
 size = width, height = 1280, 720
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Roquelike Game')
 clock = pygame.time.Clock()
 
 
@@ -490,8 +489,8 @@ if __name__ == '__main__':
 
     # TODO: Сделать скины?)
 
-    loading_scene()
-    game_settings = menu_scene()
+    loading_scene(screen)
+    game_settings = menu_scene(screen)
 
     # TODO: !Сделать арену на выживание!
     # TODO: !Сделать дроп хпшек!
@@ -569,6 +568,6 @@ if __name__ == '__main__':
         pygame.display.flip()
 
     if game_over:
-        game_over_scene()
+        game_over_scene(screen)
 
     pygame.quit()
