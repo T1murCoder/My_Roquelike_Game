@@ -265,8 +265,16 @@ class Enemy(pygame.sprite.Sprite):
         angle = math.atan2(y_diff, x_diff)
         x_movement = int(math.cos(angle) * self.speed)
         y_movement = int(math.sin(angle) * self.speed)
-        # TODO: Сделать так чтобы враги не могли ходить сквозь стены, для этого отдельно двигаем по x, и по y
-        self.rect = self.rect.move(x_movement, y_movement)
+
+        self.rect = self.rect.move(x_movement, 0)
+        if pygame.sprite.spritecollideany(self, wall_sprites):
+            self.rect = self.rect.move(-x_movement, 0)
+
+        self.rect = self.rect.move(0, y_movement)
+        if pygame.sprite.spritecollideany(self, wall_sprites):
+            self.rect = self.rect.move(0, -y_movement)
+        # TODO: Делать ли pathfinding?
+        # self.rect = self.rect.move(x_movement, y_movement)
 
     def change_phase(self, reset=False):
         if reset:
@@ -320,11 +328,16 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (11, 21))
         self.image = pygame.transform.rotate(self.image, -90)
 
-        # Calculate the angle to rotate image
+        self.speed = 15
+
+        # Calculate the angle to rotate image and move
         x_diff = mouse_x - x
         y_diff = mouse_y - y
-        angle = math.degrees(math.atan2(-y_diff, x_diff))
-        self.image = pygame.transform.rotate(self.image, angle)
+        angle = math.atan2(y_diff, x_diff)
+        self.image = pygame.transform.rotate(self.image, -math.degrees(angle))
+
+        self.x_movement = int(math.cos(angle) * self.speed)
+        self.y_movement = int(math.sin(angle) * self.speed)
 
         self.rect = self.image.get_rect()
         self.rect.centerx = x
@@ -333,17 +346,9 @@ class Bullet(pygame.sprite.Sprite):
         self.spawn_y = y
         self.mouse_x = mouse_x
         self.mouse_y = mouse_y
-        self.speed = 15
 
     def move(self):
-        # TODO: Оптимизировать
-        # Calculate the direction
-        x_diff = self.mouse_x - self.spawn_x
-        y_diff = self.mouse_y - self.spawn_y
-        angle = math.atan2(y_diff, x_diff)
-        x_movement = int(math.cos(angle) * self.speed)
-        y_movement = int(math.sin(angle) * self.speed)
-        self.rect = self.rect.move(x_movement, y_movement)
+        self.rect = self.rect.move(self.x_movement, self.y_movement)
 
     def update(self, *args):
         if pygame.sprite.spritecollideany(self, wall_sprites):
@@ -479,17 +484,17 @@ def spawn_enemies(count):
 
 if __name__ == '__main__':
     fps = 30
-    # TODO: Сделать скорость передвижение не зависящую от fps
     pygame.mouse.set_visible(False)
 
-    # TODO: Сделать ресайз
+    # TODO: !Сделать ресайз!
+
     # TODO: Сделать скины?)
 
     loading_scene()
     game_settings = menu_scene()
 
-    # TODO: Сделать арену на выживание
-    # TODO: Сделать дроп хпшек
+    # TODO: !Сделать арену на выживание!
+    # TODO: !Сделать дроп хпшек!
 
     # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
