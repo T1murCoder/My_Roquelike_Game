@@ -5,7 +5,7 @@ import os
 
 
 pygame.init()
-size = width, height = 1280, 720
+size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
 FONT = pygame.font.Font(None, 50)
 
@@ -83,9 +83,11 @@ def menu_scene(surface):
         if fullscreen_toggled is False:
             fullscreen_toggled = True
             menu_settings_page.option_text[0] = "Fullscreen - on"
+            pygame.display.toggle_fullscreen()
         else:
             fullscreen_toggled = False
             menu_settings_page.option_text[0] = "Fullscreen - off"
+            pygame.display.toggle_fullscreen()
 
     def switch_sound_mode():
         nonlocal sound_toggled
@@ -126,6 +128,8 @@ def menu_scene(surface):
                         menu_settings_page.switch(1)
                     elif event.key == pygame.K_SPACE:
                         menu_settings_page.select()
+                if event.key == pygame.K_F11:
+                    switch_display_mode()
 
         surface.fill("#0d0e2e")
         if current_page == "main":
@@ -137,7 +141,7 @@ def menu_scene(surface):
         surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
         pygame.display.flip()
-    return {"Fullscreen_toggled": fullscreen_toggled, "Sound_toggled": sound_toggled}
+    return {"Sound_toggled": sound_toggled}
 
 
 def loading_scene(surface):
@@ -150,11 +154,12 @@ def loading_scene(surface):
 
     # load background image
     loading_bg_image = load_image("loading/loading_bar_background.png")
-    loading_bg_rect = loading_bg_image.get_rect(center=(640, 360))
+    loading_bar_image = load_image("loading/loading_bar.png")
 
     # load bar image
-    loading_bar_image = load_image("loading/loading_bar.png")
-    loading_bar_rect = loading_bar_image.get_rect(midleft=(280, 360))
+    loading_bg_rect = loading_bg_image.get_rect(center=(width // 2, height // 2))
+    loading_bar_rect = loading_bar_image.get_rect(midleft=(width // 2 - loading_bg_image.get_width() // 2 + 20,
+                                                           height // 2))
 
     for i in range(WORK):
         surface.fill("#0d0e2e")

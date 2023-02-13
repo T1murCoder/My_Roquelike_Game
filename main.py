@@ -10,7 +10,7 @@ import pytmx
 
 from menu import menu_scene, loading_scene, game_over_scene
 
-size = width, height = 1280, 720
+size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
@@ -485,8 +485,6 @@ if __name__ == '__main__':
     fps = 30
     pygame.mouse.set_visible(False)
 
-    # TODO: !Сделать ресайз!
-
     # TODO: Сделать скины?)
 
     loading_scene(screen)
@@ -534,7 +532,8 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                pass
+                if event.key == pygame.K_F11:
+                    pygame.display.toggle_fullscreen()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Shooting
                 if event.button == 1:
