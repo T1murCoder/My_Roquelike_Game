@@ -272,8 +272,6 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.rect.move(0, y_movement)
         if pygame.sprite.spritecollideany(self, wall_sprites):
             self.rect = self.rect.move(0, -y_movement)
-        # TODO: Делать ли pathfinding?
-        # self.rect = self.rect.move(x_movement, y_movement)
 
     def change_phase(self, reset=False):
         if reset:
@@ -355,6 +353,12 @@ class Bullet(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, enemies_sprites):
             self.kill()
         self.move()
+
+
+class Heart(pygame.sprite.Sprite):
+    # TODO: Сделать класс хпшек
+    # TODO: !Сделать дроп хпшек!
+    pass
 
 
 class Gun(pygame.sprite.Sprite):
@@ -485,13 +489,11 @@ if __name__ == '__main__':
     fps = 30
     pygame.mouse.set_visible(False)
 
-    # TODO: Сделать скины?)
-
     loading_scene(screen)
     game_settings = menu_scene(screen)
 
     # TODO: !Сделать арену на выживание!
-    # TODO: !Сделать дроп хпшек!
+    # TODO: Сделать спавн врагов для арены
 
     # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
@@ -512,7 +514,7 @@ if __name__ == '__main__':
     # create Camera
     camera = Camera()
 
-    level = Level("map.tmx")
+    level = Level("arena_map.tmx")
 
     # create Crosshair
     Crosshair(crosshair_sprite)
