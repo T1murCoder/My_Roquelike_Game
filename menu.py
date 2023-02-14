@@ -109,9 +109,21 @@ def menu_scene(surface):
     volume_idx = volume_list.index(volume)
     volume_text = f"Volume -> {volume_list[volume_idx]}"
 
+    def save_settings_file():
+        with open("data/settings/settings.json", "w") as file:
+            option_text = menu_settings_page.option_text[2]
+            volume = int(option_text[option_text.find('>') + 1:])
+            dt = {
+                "fullscreen_toggled": fullscreen_toggled,
+                "sound_toggled": sound_toggled,
+                "volume": volume
+                }
+            json.dump(dt, file)
+
     def start_game():
         nonlocal menu_running
         menu_running = False
+        save_settings_file()
 
     def switch_page():
         nonlocal current_page
@@ -239,6 +251,7 @@ def loading_scene(surface):
 
 def game_over_scene(surface):
     game_over_image = load_image("menu_bgs/game_over.png")
+    game_over_image = pygame.transform.scale(game_over_image, size)
 
     game_over_running = True
     while game_over_running:
