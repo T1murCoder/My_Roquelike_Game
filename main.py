@@ -42,7 +42,7 @@ class Level:
 
     def create_tile_sprites(self):
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
-        # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как раньше
+        # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как сейчас
         walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
 
         for y in range(self.height):
@@ -427,30 +427,6 @@ class Gun(pygame.sprite.Sprite):
         self.set_pos()
 
 
-# TODO: Убрать класс Border
-class Border(pygame.sprite.Sprite):
-    def __init__(self, side, *group):
-        super().__init__(*group)
-        if side == "right" or side == "left":
-            self.image = pygame.Surface((10, height))
-            pygame.draw.rect(self.image, pygame.Color("purple"), (0, 0, 10, height))
-            self.rect = self.image.get_rect()
-            if side == "left":
-                self.rect.x = 0
-            else:
-                self.rect.x = width - 10
-            self.rect.y = 0
-        elif side == "up" or side == "down":
-            self.image = pygame.Surface((width, 10))
-            pygame.draw.rect(self.image, pygame.Color("purple"), (0, 0, width, 10))
-            self.rect = self.image.get_rect()
-            self.rect.x = 0
-            if side == "up":
-                self.rect.y = 0
-            else:
-                self.rect.y = height - 10
-
-
 class Crosshair(pygame.sprite.Sprite):
     def __init__(self, *group):
         super().__init__(*group)
@@ -494,7 +470,8 @@ def spawn_enemies(count):
         enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
         enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
         enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
-        while pygame.sprite.spritecollideany(enemy, player_sprite):
+        while pygame.sprite.spritecollideany(enemy, player_sprite)\
+                or pygame.sprite.spritecollideany(enemy, wall_sprites):
             enemy.kill()
             enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
             enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
@@ -512,9 +489,8 @@ if __name__ == '__main__':
     menu_scene(screen)
 
     # TODO: !Сделать арену на выживание!
-    # TODO: Сделать спавн врагов для арены
+    # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
 
-    # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
 
     # TODO: Добавить звуки выстрела, смерти мобов и получения урона
