@@ -2,6 +2,7 @@ import sys
 
 import pygame
 import os
+import json
 
 
 pygame.init()
@@ -75,12 +76,38 @@ def load_image(name, colorkey=None):
 def menu_scene(surface):
     hints_image = load_image("menu/controls_hint.png")
 
+    def load_settings_data():
+        nonlocal fullscreen_toggled, sound_toggled, volume
+        with open("data/settings/settings.json") as file:
+            f = file.read()
+            data = json.loads(f)
+            fullscreen_toggled = data["fullscreen_toggled"]
+            sound_toggled = data["sound_toggled"]
+            volume = data["volume"]
+            if not (0 <= volume <= 100):
+                volume = 100
+
     menu_running = True
 
     current_page = "main"
 
     fullscreen_toggled = False
     sound_toggled = True
+    volume = 100
+
+    load_settings_data()
+
+    if fullscreen_toggled:
+        pygame.display.toggle_fullscreen()
+
+    if not sound_toggled:
+        pygame.mixer.music.set_volume(0)
+
+    fullscreen_text = "Fullscreen - off" if not fullscreen_toggled else "Fullscreen - on"
+    sound_text = "Sound - on" if sound_toggled else "Sound - off"
+    volume_list = [i for i in range(0, 101, 10)]
+    volume_idx = volume_list.index(volume)
+    volume_text = f"Volume -> {volume_list[volume_idx]}"
 
     def start_game():
         nonlocal menu_running
@@ -111,14 +138,17 @@ def menu_scene(surface):
         if sound_toggled is False:
             sound_toggled = True
             menu_settings_page.option_text[1] = "Sound - on"
+            set_music_volume()
         else:
             sound_toggled = False
             menu_settings_page.option_text[1] = "Sound - off"
+            pygame.mixer.music.set_volume(0)
 
     def set_music_volume():
-        option_text = menu_settings_page.option_text[2]
-        volume = int(option_text[option_text.find('>') + 1:])
-        pygame.mixer.music.set_volume(volume / 100)
+        if sound_toggled:
+            option_text = menu_settings_page.option_text[2]
+            volume = int(option_text[option_text.find('>') + 1:])
+            pygame.mixer.music.set_volume(volume / 100)
 
     menu_main_page = Menu()
     menu_main_page.append_option("Play", start_game)
@@ -126,20 +156,12 @@ def menu_scene(surface):
     menu_main_page.append_option("Quit", lambda: sys.exit(0))
 
     menu_settings_page = Menu()
-    menu_settings_page.append_option("Fullscreen - off", switch_display_mode)
-    menu_settings_page.append_option("Sound - on", switch_sound_mode)
-    menu_settings_page.append_option("Volume -> 100", set_music_volume,
-                                     ["Volume -> 10",
-                                      "Volume -> 20",
-                                      "Volume -> 30",
-                                      "Volume -> 40",
-                                      "Volume -> 50",
-                                      "Volume -> 60",
-                                      "Volume -> 70",
-                                      "Volume -> 80",
-                                      "Volume -> 90",
-                                      "Volume -> 100"], 9, True)
+    menu_settings_page.append_option(fullscreen_text, switch_display_mode)
+    menu_settings_page.append_option(sound_text, switch_sound_mode)
+    menu_settings_page.append_option(volume_text, set_music_volume,
+                                     [f"Volume -> {i}" for i in volume_list], volume_idx, True)
     menu_settings_page.append_option("Back", switch_page)
+    set_music_volume()
 
     while menu_running:
         for event in pygame.event.get():
