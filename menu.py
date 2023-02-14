@@ -14,17 +14,33 @@ class Menu:
     def __init__(self):
         self.option_text = []
         self.functions = []
+        self.hor_values = []  # hor -> horizontal
         self.current_option_index = 0
 
-    def append_option(self, option, function):
+    def append_option(self, option, function, horizontal_values=None, current_horizontal_idx=0, hor_auto_call=False):
         self.option_text.append(option)
         self.functions.append(function)
+        self.hor_values.append([horizontal_values, current_horizontal_idx, hor_auto_call])
 
-    def switch(self, direction):
+    def switch_vertical(self, direction):
         self.current_option_index += direction
         self.current_option_index %= len(self.option_text)
         if self.current_option_index < 0:
             self.current_option_index = len(self.option_text) - 1
+
+    def switch_horizontal(self, direction):
+
+        if self.hor_values[self.current_option_index][0]:
+            self.hor_values[self.current_option_index][1] += direction
+            self.hor_values[self.current_option_index][1] %= len(self.hor_values[self.current_option_index][0])
+            if self.hor_values[self.current_option_index][1] < 0:
+                self.hor_values[self.current_option_index][1] = len(self.hor_values[self.current_option_index][0]) - 1
+            current_option_array = self.hor_values[self.current_option_index]
+            current_option_array_index = current_option_array[1]
+            option_text = current_option_array[0][current_option_array_index]
+            self.option_text[self.current_option_index] = option_text
+            if current_option_array[2]:
+                self.functions[self.current_option_index]()
 
     def select(self):
         self.functions[self.current_option_index]()
@@ -99,6 +115,11 @@ def menu_scene(surface):
             sound_toggled = False
             menu_settings_page.option_text[1] = "Sound - off"
 
+    def set_music_volume():
+        option_text = menu_settings_page.option_text[2]
+        volume = int(option_text[option_text.find('>') + 1:])
+        pygame.mixer.music.set_volume(volume / 100)
+
     menu_main_page = Menu()
     menu_main_page.append_option("Play", start_game)
     menu_main_page.append_option("Settings", switch_page)
@@ -107,6 +128,17 @@ def menu_scene(surface):
     menu_settings_page = Menu()
     menu_settings_page.append_option("Fullscreen - off", switch_display_mode)
     menu_settings_page.append_option("Sound - on", switch_sound_mode)
+    menu_settings_page.append_option("Volume -> 100", set_music_volume,
+                                     ["Volume -> 10",
+                                      "Volume -> 20",
+                                      "Volume -> 30",
+                                      "Volume -> 40",
+                                      "Volume -> 50",
+                                      "Volume -> 60",
+                                      "Volume -> 70",
+                                      "Volume -> 80",
+                                      "Volume -> 90",
+                                      "Volume -> 100"], 9, True)
     menu_settings_page.append_option("Back", switch_page)
 
     while menu_running:
@@ -116,18 +148,22 @@ def menu_scene(surface):
             elif event.type == pygame.KEYDOWN:
                 if current_page == "main":
                     if event.key == pygame.K_w:
-                        menu_main_page.switch(-1)
+                        menu_main_page.switch_vertical(-1)
                     elif event.key == pygame.K_s:
-                        menu_main_page.switch(1)
+                        menu_main_page.switch_vertical(1)
                     elif event.key == pygame.K_SPACE:
                         menu_main_page.select()
                 else:
                     if event.key == pygame.K_w:
-                        menu_settings_page.switch(-1)
+                        menu_settings_page.switch_vertical(-1)
                     elif event.key == pygame.K_s:
-                        menu_settings_page.switch(1)
+                        menu_settings_page.switch_vertical(1)
                     elif event.key == pygame.K_SPACE:
                         menu_settings_page.select()
+                    elif event.key == pygame.K_d:
+                        menu_settings_page.switch_horizontal(1)
+                    elif event.key == pygame.K_a:
+                        menu_settings_page.switch_horizontal(-1)
                 if event.key == pygame.K_F11:
                     switch_display_mode()
 
@@ -141,7 +177,6 @@ def menu_scene(surface):
         surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
         pygame.display.flip()
-    return {"Sound_toggled": sound_toggled}
 
 
 def loading_scene(surface):

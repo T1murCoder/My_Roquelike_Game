@@ -504,14 +504,19 @@ if __name__ == '__main__':
     fps = 30
     pygame.mouse.set_visible(False)
 
+    pygame.mixer.music.load("data/sounds/game_soundtrack.mp3")
+    pygame.mixer.music.play(-1)
+
     loading_scene(screen)
-    game_settings = menu_scene(screen)
+    menu_scene(screen)
 
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены
 
     # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
+
+    # TODO: Добавить звуки
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
