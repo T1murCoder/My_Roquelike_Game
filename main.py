@@ -42,6 +42,7 @@ class Level:
 
     def create_tile_sprites(self):
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
+        # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как раньше
         walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
 
         for y in range(self.height):
@@ -516,7 +517,7 @@ if __name__ == '__main__':
     # TODO: Добавить файл с конфигом?
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
 
-    # TODO: Добавить звуки
+    # TODO: Добавить звуки выстрела, смерти мобов и получения урона
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -534,7 +535,6 @@ if __name__ == '__main__':
     # create Camera
     camera = Camera()
 
-    # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как раньше
     level = Level("arena_map.tmx")
 
     # create Crosshair

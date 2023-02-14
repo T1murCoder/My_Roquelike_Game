@@ -110,6 +110,7 @@ def menu_scene(surface):
     volume_text = f"Volume -> {volume_list[volume_idx]}"
 
     def save_settings_file():
+        print(1)
         with open("data/settings/settings.json", "w") as file:
             option_text = menu_settings_page.option_text[2]
             volume = int(option_text[option_text.find('>') + 1:])
@@ -156,6 +157,12 @@ def menu_scene(surface):
             menu_settings_page.option_text[1] = "Sound - off"
             pygame.mixer.music.set_volume(0)
 
+    def function_for_quit():
+        """По большому счёту, это костыль, потому что я не нашёл способа
+            как адекватно можно вызвать две функции в одной строке"""
+        save_settings_file()
+        sys.exit(0)
+
     def set_music_volume():
         if sound_toggled:
             option_text = menu_settings_page.option_text[2]
@@ -165,7 +172,7 @@ def menu_scene(surface):
     menu_main_page = Menu()
     menu_main_page.append_option("Play", start_game)
     menu_main_page.append_option("Settings", switch_page)
-    menu_main_page.append_option("Quit", lambda: sys.exit(0))
+    menu_main_page.append_option("Quit", function_for_quit)
 
     menu_settings_page = Menu()
     menu_settings_page.append_option(fullscreen_text, switch_display_mode)
@@ -178,6 +185,7 @@ def menu_scene(surface):
     while menu_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_settings_file()
                 sys.exit(0)
             elif event.type == pygame.KEYDOWN:
                 if current_page == "main":
