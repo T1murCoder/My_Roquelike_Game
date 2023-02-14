@@ -245,6 +245,7 @@ class Enemy(pygame.sprite.Sprite):
         self.phase = 0
         self.orientation = "right"
         self.get_orientation()
+        self.hp_drop_chance = [0, 0, 0, 1]
         self.health = health
 
     def get_orientation(self):
@@ -310,6 +311,8 @@ class Enemy(pygame.sprite.Sprite):
             self.get_orientation()
             self.change_phase(reset=True)
         if self.health == 0:
+            if random.choice(self.hp_drop_chance):
+                Heart(self.rect.centerx, self.rect.centery, [all_sprites])
             self.kill()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
             self.health -= 1
@@ -356,9 +359,21 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Heart(pygame.sprite.Sprite):
-    # TODO: Сделать класс хпшек
-    # TODO: !Сделать дроп хпшек!
-    pass
+    image = load_image("interface/half_heart.png")
+    image = pygame.transform.scale(image, (19, 15))
+
+    def __init__(self, x, y, *group):
+        super().__init__(*group)
+        self.image = Heart.image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self, *args):
+        if pygame.sprite.spritecollideany(self, player_sprite):
+            if player.current_hp != player.max_hp:
+                player.get_heal()
+                self.kill()
 
 
 class Gun(pygame.sprite.Sprite):
@@ -514,6 +529,7 @@ if __name__ == '__main__':
     # create Camera
     camera = Camera()
 
+    # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как раньше
     level = Level("arena_map.tmx")
 
     # create Crosshair

@@ -171,10 +171,10 @@ def loading_scene(surface):
         surface.blit(loading_bg_image, loading_bg_rect)
         surface.blit(loading_bar_image_resized, loading_bar_rect)
         surface.blit(game_logo_image, (width - 20 - game_logo_image.get_width(),
-                                      height - 20 - game_logo_image.get_height()))
+                                       height - 20 - game_logo_image.get_height()))
 
         surface.blit(game_name_image, (width // 2 - game_name_image.get_width() // 2,
-                                      height // 2 - game_name_image.get_height() - 100))
+                                       height // 2 - game_name_image.get_height() - 100))
 
         pygame.display.flip()
         CLOCK.tick(60)
