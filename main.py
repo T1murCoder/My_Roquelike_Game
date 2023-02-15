@@ -10,8 +10,9 @@ import pytmx
 
 from menu import menu_scene, loading_scene, game_over_scene
 
-size = width, height = 1920, 1080
+size = width, height = 1280, 720  # Тут данные из настроек
 screen = pygame.display.set_mode(size)
+virtual_screen = pygame.surface.Surface((1920, 1080))
 clock = pygame.time.Clock()
 
 
@@ -178,19 +179,19 @@ class Player(pygame.sprite.Sprite):
         half_heart = (self.max_hp - self.current_hp) % 2
         no_hearts = max_hearts - half_heart - full_hearts
         for i in range(max_hearts):
-            screen.blit(Player.no_heart_image, (heart_x, heart_y))
+            virtual_screen.blit(Player.no_heart_image, (heart_x, heart_y))
             heart_x += 10 + heart_image_width
         if self.current_hp > 0:
             heart_x = 10
             if full_hearts:
                 for i in range(full_hearts):
-                    screen.blit(Player.heart_image, (heart_x, heart_y))
+                    virtual_screen.blit(Player.heart_image, (heart_x, heart_y))
                     heart_x += 10 + heart_image_width
             if half_heart:
-                screen.blit(Player.half_heart_image, (heart_x, heart_y))
+                virtual_screen.blit(Player.half_heart_image, (heart_x, heart_y))
             if no_hearts:
                 for i in range(no_hearts):
-                    screen.blit(Player.no_heart_image, (heart_x, heart_y))
+                    virtual_screen.blit(Player.no_heart_image, (heart_x, heart_y))
                     heart_x += 10 + heart_image_width
 
     def get_damage(self):
@@ -485,8 +486,8 @@ if __name__ == '__main__':
     pygame.mixer.music.load("data/sounds/game_soundtrack.mp3")
     pygame.mixer.music.play(-1)
 
-    loading_scene(screen)
-    menu_scene(screen)
+    loading_scene(virtual_screen, screen)
+    menu_scene(virtual_screen, screen)
 
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
@@ -552,22 +553,23 @@ if __name__ == '__main__':
         # for sprite in gun_sprites:
         #     camera.apply(sprite)
 
-        screen.fill(pygame.Color("black"))
+        virtual_screen.fill(pygame.Color("black"))
 
-        level_sprites.draw(screen)
+        level_sprites.draw(virtual_screen)
 
         all_sprites.update()
-        all_sprites.draw(screen)
+        all_sprites.draw(virtual_screen)
 
         gun_sprites.update()
-        gun_sprites.draw(screen)
+        gun_sprites.draw(virtual_screen)
 
         crosshair_sprite.update()
-        crosshair_sprite.draw(screen)
+        crosshair_sprite.draw(virtual_screen)
 
+        screen.blit(pygame.transform.scale(virtual_screen, (1920, 1080)), (0, 0))
         pygame.display.flip()
 
     if game_over:
-        game_over_scene(screen)
+        game_over_scene(virtual_screen, screen)
 
     pygame.quit()

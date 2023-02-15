@@ -7,7 +7,7 @@ import json
 
 pygame.init()
 size = width, height = 1920, 1080
-screen = pygame.display.set_mode(size)
+virtual_screen = pygame.display.set_mode(size)
 FONT = pygame.font.Font(None, 50)
 
 
@@ -73,7 +73,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def menu_scene(surface):
+def menu_scene(surface, real_screen):
     hints_image = load_image("menu/controls_hint.png")
 
     def load_settings_data():
@@ -110,7 +110,6 @@ def menu_scene(surface):
     volume_text = f"Volume -> {volume_list[volume_idx]}"
 
     def save_settings_file():
-        print(1)
         with open("data/settings/settings.json", "w") as file:
             option_text = menu_settings_page.option_text[2]
             volume = int(option_text[option_text.find('>') + 1:])
@@ -218,10 +217,12 @@ def menu_scene(surface):
 
         surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
+        real_screen.blit(pygame.transform.scale(surface, real_screen.get_size()), (0, 0))
+
         pygame.display.flip()
 
 
-def loading_scene(surface):
+def loading_scene(surface, real_screen):
     CLOCK = pygame.time.Clock()
 
     WORK = 100
@@ -253,11 +254,13 @@ def loading_scene(surface):
         surface.blit(game_name_image, (width // 2 - game_name_image.get_width() // 2,
                                        height // 2 - game_name_image.get_height() - 100))
 
+        real_screen.blit(pygame.transform.scale(surface, real_screen.get_size()), (0, 0))
+
         pygame.display.flip()
         CLOCK.tick(60)
 
 
-def game_over_scene(surface):
+def game_over_scene(surface, real_screen):
     game_over_image = load_image("menu_bgs/game_over.png")
     game_over_image = pygame.transform.scale(game_over_image, size)
 
@@ -269,5 +272,8 @@ def game_over_scene(surface):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     game_over_running = False
-        surface.blit(game_over_image, (0, 0))
+        surface.blit(pygame.transform.scale(game_over_image, (1920, 1080)), (0, 0))
+
+        real_screen.blit(pygame.transform.scale(surface, real_screen.get_size()), (0, 0))
+
         pygame.display.flip()
