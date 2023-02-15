@@ -73,6 +73,14 @@ def load_image(name, colorkey=None):
     return image
 
 
+def get_size_from_json():
+    with open("data/settings/settings.json") as file:
+        f = file.read()
+        data = json.loads(f)
+        size = data["size"]
+    return size
+
+
 def menu_scene(surface, real_screen):
     hints_image = load_image("menu/controls_hint.png")
 
@@ -116,7 +124,8 @@ def menu_scene(surface, real_screen):
             dt = {
                 "fullscreen_toggled": fullscreen_toggled,
                 "sound_toggled": sound_toggled,
-                "volume": volume
+                "volume": volume,
+                "size": (1280, 720)
                 }
             json.dump(dt, file)
 
@@ -178,6 +187,7 @@ def menu_scene(surface, real_screen):
     menu_settings_page.append_option(sound_text, switch_sound_mode)
     menu_settings_page.append_option(volume_text, set_music_volume,
                                      [f"Volume -> {i}" for i in volume_list], volume_idx, True)
+    # TODO: Сделать настройку разрешения игры
     menu_settings_page.append_option("Back", switch_page)
     set_music_volume()
 

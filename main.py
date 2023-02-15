@@ -8,9 +8,9 @@ import sys
 import pygame
 import pytmx
 
-from menu import menu_scene, loading_scene, game_over_scene
+from menu import menu_scene, loading_scene, game_over_scene, get_size_from_json
 
-size = width, height = 1280, 720  # Тут данные из настроек
+size = width, height = get_size_from_json()
 screen = pygame.display.set_mode(size)
 virtual_screen = pygame.surface.Surface((1920, 1080))
 clock = pygame.time.Clock()
