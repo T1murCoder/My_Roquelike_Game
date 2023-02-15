@@ -330,7 +330,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (11, 21))
         self.image = pygame.transform.rotate(self.image, -90)
 
-        self.speed = 15
+        self.speed = 20
 
         # Calculate the angle to rotate image and move
         x_diff = mouse_x - x

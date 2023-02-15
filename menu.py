@@ -102,6 +102,7 @@ def menu_scene(surface, real_screen):
     fullscreen_toggled = False
     sound_toggled = True
     volume = 100
+    screen_resolution = get_size_from_json()
 
     load_settings_data()
 
@@ -116,6 +117,11 @@ def menu_scene(surface, real_screen):
     volume_list = [i for i in range(0, 101, 10)]
     volume_idx = volume_list.index(volume)
     volume_text = f"Volume -> {volume_list[volume_idx]}"
+    screen_resolution_list = [[800, 600], [1280, 720], [1920, 1080], [1920, 1200]]
+    screen_resolution_text = f"Screen resolution -> {screen_resolution[0]}x{screen_resolution[1]}"
+    screen_resolution_text_list = [f"Screen resolution -> {elem[0]}x{elem[1]}"
+                                   for elem in screen_resolution_list]
+    screen_resolution_idx = screen_resolution_list.index(screen_resolution)
 
     def save_settings_file():
         with open("data/settings/settings.json", "w") as file:
@@ -125,7 +131,7 @@ def menu_scene(surface, real_screen):
                 "fullscreen_toggled": fullscreen_toggled,
                 "sound_toggled": sound_toggled,
                 "volume": volume,
-                "size": (1280, 720)
+                "size": screen_resolution
                 }
             json.dump(dt, file)
 
@@ -165,6 +171,12 @@ def menu_scene(surface, real_screen):
             menu_settings_page.option_text[1] = "Sound - off"
             pygame.mixer.music.set_volume(0)
 
+    def set_screen_resolution():
+        nonlocal screen_resolution
+
+        text = menu_settings_page.option_text[3].split()[3]
+        screen_resolution = list(map(int, text.split("x")))
+
     def function_for_quit():
         """По большому счёту, это костыль, потому что я не нашёл способа
             как адекватно можно вызвать две функции в одной строке"""
@@ -188,6 +200,8 @@ def menu_scene(surface, real_screen):
     menu_settings_page.append_option(volume_text, set_music_volume,
                                      [f"Volume -> {i}" for i in volume_list], volume_idx, True)
     # TODO: Сделать настройку разрешения игры
+    menu_settings_page.append_option(screen_resolution_text, set_screen_resolution,
+                                     screen_resolution_text_list, screen_resolution_idx, True)
     menu_settings_page.append_option("Back", switch_page)
     set_music_volume()
 
