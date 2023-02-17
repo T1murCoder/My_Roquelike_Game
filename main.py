@@ -10,6 +10,9 @@ import pytmx
 
 from menu import menu_scene, loading_scene, game_over_scene, get_size_from_json
 
+
+pygame.mixer.pre_init(channels=1)
+pygame.init()
 size = width, height = get_size_from_json()
 screen = pygame.display.set_mode(size)
 virtual_screen = pygame.surface.Surface((1920, 1080))
@@ -491,8 +494,6 @@ if __name__ == '__main__':
 
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
-
-    # TODO: Сделать ресайз
 
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
 
