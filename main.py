@@ -8,10 +8,10 @@ import sys
 import pygame
 import pytmx
 
-from menu import menu_scene, loading_scene, game_over_scene, get_size_from_json
+from menu import menu_scene, loading_scene, game_over_scene, get_size_from_json, get_sfx_volume_from_json
 
 
-pygame.mixer.pre_init(channels=1)
+pygame.mixer.pre_init()
 pygame.init()
 size = width, height = get_size_from_json()
 screen = pygame.display.set_mode(size)
@@ -172,6 +172,7 @@ class Player(pygame.sprite.Sprite):
             bullet_y = player_gun.rect.centery
             Bullet(bullet_x, bullet_y, mouse_x, mouse_y, [bullet_sprites, all_sprites])
             self.ready_to_shoot = False
+            gun_shot_snd.play()
 
     def draw_hp(self):
         heart_x = 10
@@ -203,6 +204,7 @@ class Player(pygame.sprite.Sprite):
             if self.current_hp < 0:
                 self.current_hp = 0
             self.ready_to_take_damage = False
+            getting_damage_snd.play()
 
     def get_heal(self):
         self.current_hp += 1
@@ -319,6 +321,7 @@ class Enemy(pygame.sprite.Sprite):
             if random.choice(self.hp_drop_chance):
                 Heart(self.rect.centerx, self.rect.centery, [all_sprites])
             self.kill()
+            enemy_death_snd.play()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
             self.health -= 1
         self.check_hit_player()
@@ -492,12 +495,20 @@ if __name__ == '__main__':
     loading_scene(virtual_screen, screen)
     menu_scene(virtual_screen, screen)
 
+    sfx_volume = get_sfx_volume_from_json() / 100
+
+    gun_shot_snd = pygame.mixer.Sound("data/sounds/gun_shot.mp3")
+    getting_damage_snd = pygame.mixer.Sound("data/sounds/getting_damage.wav")
+    enemy_death_snd = pygame.mixer.Sound("data/sounds/enemy_death.mp3")
+
+    gun_shot_snd.set_volume(sfx_volume)
+    getting_damage_snd.set_volume(sfx_volume)
+    enemy_death_snd.set_volume(sfx_volume)
+
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
 
     # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
-
-    # TODO: Добавить звуки выстрела, смерти мобов и получения урона
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()

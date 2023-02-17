@@ -93,6 +93,14 @@ def get_size_from_json():
     return size
 
 
+def get_sfx_volume_from_json():
+    with open("data/settings/settings.json") as file:
+        f = file.read()
+        data = json.loads(f)
+        volume = data["sfx_volume"]
+    return volume
+
+
 def menu_scene(surface, real_screen):
     hints_image = load_image("menu/controls_hint.png")
 
@@ -248,6 +256,7 @@ def menu_scene(surface, real_screen):
 
     menu_settings_page.append_option(sfx_volume_text, set_sfx_volume,
                                      [f"Sfx volume -> {i}" for i in volume_list], sfx_volume_idx, True)
+
     menu_settings_page.append_option("Back", switch_page)
     set_music_volume()
 
