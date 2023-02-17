@@ -97,14 +97,15 @@ def menu_scene(surface, real_screen):
     hints_image = load_image("menu/controls_hint.png")
 
     def load_settings_data():
-        nonlocal fullscreen_toggled, sound_toggled, volume, interface_volume
+        nonlocal fullscreen_toggled, music_toggled, volume, interface_volume, sfx_volume
         with open("data/settings/settings.json") as file:
             f = file.read()
             data = json.loads(f)
             fullscreen_toggled = data["fullscreen_toggled"]
-            sound_toggled = data["sound_toggled"]
+            music_toggled = data["music_toggled"]
             volume = data["music_volume"]
             interface_volume = data["interface_volume"]
+            sfx_volume = data["sfx_volume"]
             if not (0 <= volume <= 100):
                 volume = 100
 
@@ -113,9 +114,10 @@ def menu_scene(surface, real_screen):
     current_page = "main"
 
     fullscreen_toggled = False
-    sound_toggled = True
+    music_toggled = True
     volume = 100
     interface_volume = 100
+    sfx_volume = 100
     screen_resolution = get_size_from_json()
 
     load_settings_data()
@@ -123,14 +125,15 @@ def menu_scene(surface, real_screen):
     if fullscreen_toggled:
         pygame.display.toggle_fullscreen()
 
-    if not sound_toggled:
+    if not music_toggled:
         pygame.mixer.music.set_volume(0)
 
     fullscreen_text = "Fullscreen - off" if not fullscreen_toggled else "Fullscreen - on"
 
-    sound_text = "Sound - on" if sound_toggled else "Sound - off"
+    music_text = "Music - on" if music_toggled else "Music - off"
 
     volume_list = [i for i in range(0, 101, 10)]
+
     volume_idx = volume_list.index(volume)
     volume_text = f"Music Volume -> {volume_list[volume_idx]}"
 
@@ -140,9 +143,11 @@ def menu_scene(surface, real_screen):
                                    for elem in screen_resolution_list]
     screen_resolution_idx = screen_resolution_list.index(screen_resolution)
 
-    interface_volume_list = [i for i in range(0, 101, 10)]
-    interface_volume_idx = interface_volume_list.index(interface_volume)
-    interface_volume_text = f"Interface volume -> {interface_volume_list[interface_volume_idx]}"
+    interface_volume_idx = volume_list.index(interface_volume)
+    interface_volume_text = f"Interface volume -> {volume_list[interface_volume_idx]}"
+
+    sfx_volume_idx = volume_list.index(sfx_volume)
+    sfx_volume_text = f"Sfx volume -> {volume_list[sfx_volume_idx]}"
 
     def save_settings_file():
         with open("data/settings/settings.json", "w") as file:
@@ -150,9 +155,10 @@ def menu_scene(surface, real_screen):
             volume = int(option_text[option_text.find('>') + 1:])
             dt = {
                 "fullscreen_toggled": fullscreen_toggled,
-                "sound_toggled": sound_toggled,
+                "music_toggled": music_toggled,
                 "music_volume": volume,
                 "interface_volume": interface_volume,
+                "sfx_volume": sfx_volume,
                 "size": screen_resolution
                 }
             json.dump(dt, file)
@@ -181,16 +187,16 @@ def menu_scene(surface, real_screen):
             menu_settings_page.option_text[0] = "Fullscreen - off"
             pygame.display.toggle_fullscreen()
 
-    def switch_sound_mode():
-        nonlocal sound_toggled
+    def switch_music_mode():
+        nonlocal music_toggled
 
-        if sound_toggled is False:
-            sound_toggled = True
-            menu_settings_page.option_text[1] = "Sound - on"
+        if music_toggled is False:
+            music_toggled = True
+            menu_settings_page.option_text[1] = "Music - on"
             set_music_volume()
         else:
-            sound_toggled = False
-            menu_settings_page.option_text[1] = "Sound - off"
+            music_toggled = False
+            menu_settings_page.option_text[1] = "Music - off"
             pygame.mixer.music.set_volume(0)
 
     def set_screen_resolution():
@@ -206,7 +212,7 @@ def menu_scene(surface, real_screen):
         sys.exit(0)
 
     def set_music_volume():
-        if sound_toggled:
+        if music_toggled:
             option_text = menu_settings_page.option_text[2]
             volume = int(option_text[option_text.find('>') + 1:])
             pygame.mixer.music.set_volume(volume / 100)
@@ -217,6 +223,11 @@ def menu_scene(surface, real_screen):
         interface_volume = int(option_text[option_text.find('>') + 1:])
         menu_settings_page.set_volume(interface_volume)
 
+    def set_sfx_volume():
+        nonlocal sfx_volume
+        option_text = menu_settings_page.option_text[5]
+        sfx_volume = int(option_text[option_text.find('>') + 1:])
+
     menu_main_page = Menu(volume=interface_volume)
     menu_main_page.append_option("Play", start_game)
     menu_main_page.append_option("Settings", switch_page)
@@ -224,14 +235,19 @@ def menu_scene(surface, real_screen):
 
     menu_settings_page = Menu(volume=interface_volume)
     menu_settings_page.append_option(fullscreen_text, switch_display_mode)
-    menu_settings_page.append_option(sound_text, switch_sound_mode)
+    menu_settings_page.append_option(music_text, switch_music_mode)
     menu_settings_page.append_option(volume_text, set_music_volume,
                                      [f"Music volume -> {i}" for i in volume_list], volume_idx, True)
+
     menu_settings_page.append_option(screen_resolution_text, set_screen_resolution,
                                      screen_resolution_text_list, screen_resolution_idx, True)
+
     menu_settings_page.append_option(interface_volume_text, set_interface_volume,
-                                     [f"Interface volume -> {i}" for i in interface_volume_list],
+                                     [f"Interface volume -> {i}" for i in volume_list],
                                      interface_volume_idx, True)
+
+    menu_settings_page.append_option(sfx_volume_text, set_sfx_volume,
+                                     [f"Sfx volume -> {i}" for i in volume_list], sfx_volume_idx, True)
     menu_settings_page.append_option("Back", switch_page)
     set_music_volume()
 
@@ -267,7 +283,7 @@ def menu_scene(surface, real_screen):
             menu_main_page.draw(surface, 100, 100, 50)
         else:
             menu_settings_page.draw(surface, 100, 100, 50)
-            # print(f"Fullscreen - {fullscreen_toggled}, Sound - {sound_toggled}")
+            # print(f"Fullscreen - {fullscreen_toggled}, Sound - {music_toggled}")
 
         surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
 
