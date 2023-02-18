@@ -504,8 +504,6 @@ if __name__ == '__main__':
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
 
-    # TODO: Сделать победу
-
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
     player_sprite = pygame.sprite.Group()
