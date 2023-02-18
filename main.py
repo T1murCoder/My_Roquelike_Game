@@ -8,6 +8,7 @@ import pytmx
 from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image
 from loading import loading_scene
 from game_over import game_over_scene
+from win import win_scene
 
 
 pygame.mixer.pre_init()
@@ -302,9 +303,15 @@ class Enemy(pygame.sprite.Sprite):
             self.get_orientation()
             self.change_phase(reset=True)
         if self.health == 0:
+            global kills
             if random.choice(self.hp_drop_chance):
                 Heart(self.rect.centerx, self.rect.centery, [all_sprites])
             self.kill()
+            kills += 1
+            if kills == enemies_count:
+                global running, win
+                running = False
+                win = True
             enemy_death_snd.play()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
             self.health -= 1
@@ -471,6 +478,11 @@ def spawn_enemies(count):
 
 if __name__ == '__main__':
     fps = 30
+
+    enemies_count = 5
+
+    kills = 0
+
     pygame.mouse.set_visible(False)
 
     pygame.mixer.music.load("data/sounds/game_soundtrack.mp3")
@@ -519,9 +531,10 @@ if __name__ == '__main__':
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
     player_gun = Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
 
-    spawn_enemies(5)
+    spawn_enemies(enemies_count)
 
     game_over = False
+    win = False
 
     running = True
     while running:
@@ -562,7 +575,9 @@ if __name__ == '__main__':
         screen.blit(pygame.transform.scale(virtual_screen, (1920, 1080)), (0, 0))
         pygame.display.flip()
 
-    if game_over:
+    if win:
+        win_scene(virtual_screen, screen)
+    elif game_over:
         game_over_scene(virtual_screen, screen)
 
     pygame.quit()
