@@ -14,6 +14,8 @@ pygame.mixer.pre_init()
 pygame.init()
 size = width, height = get_size_from_json()
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Roguelike-game")
+pygame.display.set_icon(load_image("icon/icon.png"))
 virtual_screen = pygame.surface.Surface((1920, 1080))
 clock = pygame.time.Clock()
 
