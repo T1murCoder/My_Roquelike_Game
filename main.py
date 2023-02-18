@@ -2,13 +2,12 @@ import random
 
 import math
 
-import os
-import sys
-
 import pygame
 import pytmx
 
-from menu import menu_scene, loading_scene, game_over_scene, get_size_from_json, get_sfx_volume_from_json
+from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image
+from loading import loading_scene
+from game_over import game_over_scene
 
 
 pygame.mixer.pre_init()
@@ -17,23 +16,6 @@ size = width, height = get_size_from_json()
 screen = pygame.display.set_mode(size)
 virtual_screen = pygame.surface.Surface((1920, 1080))
 clock = pygame.time.Clock()
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    # если файл не существует, то выходим
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
 
 
 class Level:
@@ -508,7 +490,7 @@ if __name__ == '__main__':
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
 
-    # TODO: Добавить паузу(esc) при паузе не обновляются события, но продолжают отрисовываться + появляется меню с продолжением или выходом из игры
+    # TODO: Сделать победу
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -561,9 +543,6 @@ if __name__ == '__main__':
 
         for sprite in level_sprites:
             camera.apply(sprite)
-
-        # for sprite in gun_sprites:
-        #     camera.apply(sprite)
 
         virtual_screen.fill(pygame.Color("black"))
 
