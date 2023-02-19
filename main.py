@@ -235,7 +235,7 @@ class Enemy(pygame.sprite.Sprite):
 
     vision_range = 500
 
-    def __init__(self, x, y, health, *group):
+    def __init__(self, x, y, health, drop_chance, *group):
         super().__init__(*group)
         self.image = Enemy.stand_image_right
         self.rect = self.image.get_rect()
@@ -246,7 +246,7 @@ class Enemy(pygame.sprite.Sprite):
         self.phase = 0
         self.orientation = "right"
         self.get_orientation()
-        self.hp_drop_chance = [0, 0, 0, 1]
+        self.hp_drop_chance = drop_chance
         self.health = health
 
     def get_orientation(self):
@@ -474,7 +474,7 @@ def get_enemy_coords():
     return left_x_border, up_y_border, right_x_border, down_y_border
 
 
-def spawn_enemies(count):
+def spawn_enemies(count, hp_drop_chance):
     for i in range(count):
         border_min_x, border_min_y, border_max_x, border_max_y = get_enemy_coords()
 
@@ -489,7 +489,7 @@ def spawn_enemies(count):
         enemy_x = random.randint(min_enemy_x, max_enemy_x)
         enemy_y = random.randint(min_enemy_y, max_enemy_y)
 
-        enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+        enemy = Enemy(enemy_x, enemy_y, 3, hp_drop_chance, [enemies_sprites, all_sprites])
         while pygame.sprite.spritecollideany(enemy, player_sprite)\
                 or pygame.sprite.spritecollideany(enemy, wall_sprites)\
                 or not border_min_x < enemy_x < border_max_x\
@@ -498,16 +498,6 @@ def spawn_enemies(count):
             enemy_x = random.randint(min_enemy_x, max_enemy_x)
             enemy_y = random.randint(min_enemy_y, max_enemy_y)
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
-
-        '''enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
-        enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
-        enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
-        while pygame.sprite.spritecollideany(enemy, player_sprite)\
-                or pygame.sprite.spritecollideany(enemy, wall_sprites):
-            enemy.kill()
-            enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
-            enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
-            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])'''
 
 
 def draw_kills(surface, real_screen):
@@ -551,8 +541,6 @@ def time_bar(surface, time):
 if __name__ == '__main__':
     fps = 30
 
-    enemies_count = 5
-
     kills = 0
 
     pygame.mouse.set_visible(False)
@@ -571,15 +559,37 @@ if __name__ == '__main__':
 
     if difficulty == "Easy":
         time = 60
+        interval = 30
+        enemies_count_spawn = 5
+        hp_drop_chance = [0, 0, 0, 1]
     elif difficulty == "Medium":
         time = 180
+        interval = 20
+        enemies_count_spawn = 7
+        hp_drop_chance = [0, 0, 0, 0, 1]
     elif difficulty == "Hard":
         time = 300
+        interval = 15
+        enemies_count_spawn = 9
+        hp_drop_chance = [0, 0, 0, 0, 0, 1]
+    elif difficulty == "Insane":
+        time = -1
+        interval = 15
+        enemies_count_spawn = 9
+        endless_flag = True
+        hp_drop_chance = [0, 0, 0, 0, 0, 0, 0, 0, 1]
     else:
         time = -1
+        interval = 25
+        enemies_count_spawn = 6
         endless_flag = True
+        hp_drop_chance = [0, 0, 0, 1]
 
     TIME = time * fps
+
+    enemy_spawn_timer = interval * fps
+    current_spawn_timer = 0
+    ready_to_spawn = True
 
     gun_shot_snd = pygame.mixer.Sound("data/sounds/gun_shot.mp3")
     getting_damage_snd = pygame.mixer.Sound("data/sounds/getting_damage.wav")
@@ -588,8 +598,6 @@ if __name__ == '__main__':
     gun_shot_snd.set_volume(sfx_volume)
     getting_damage_snd.set_volume(sfx_volume)
     enemy_death_snd.set_volume(sfx_volume)
-
-    # TODO: Сделать разное количество спавна мобов для разных уровней сложности, Интервалы и т.д.
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -603,10 +611,6 @@ if __name__ == '__main__':
     wall_sprites = pygame.sprite.Group()
 
     interface_sprites = pygame.sprite.Group()
-
-    enemy_spawn_timer = 30 * fps
-    current_spawn_timer = 0
-    ready_to_spawn = True
 
     current_time = TIME
 
@@ -649,7 +653,7 @@ if __name__ == '__main__':
             camera.apply(sprite)
 
         if ready_to_spawn:
-            spawn_enemies(enemies_count)
+            spawn_enemies(enemies_count_spawn, hp_drop_chance)
             ready_to_spawn = False
         else:
             current_spawn_timer += 1
