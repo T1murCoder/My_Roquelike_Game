@@ -33,7 +33,7 @@ class Level:
 
     def create_tile_sprites(self):
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
-        walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
+        walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(10)]
 
         for y in range(self.height):
             for x in range(self.width):
@@ -530,12 +530,17 @@ if __name__ == '__main__':
 
     difficulty = get_difficulty_from_json()
 
+    endless_flag = False
+
     if difficulty == "Easy":
         time = 60
     elif difficulty == "Medium":
         time = 180
-    else:
+    elif difficulty == "Hard":
         time = 300
+    else:
+        time = -1
+        endless_flag = True
 
     TIME = time * fps
 
@@ -617,7 +622,8 @@ if __name__ == '__main__':
         gun_sprites.update()
         gun_sprites.draw(virtual_screen)
 
-        time_bar(virtual_screen, TIME)
+        if not endless_flag:
+            time_bar(virtual_screen, TIME)
 
         draw_kills(virtual_screen, screen)
 

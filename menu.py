@@ -153,7 +153,7 @@ def menu_scene(surface, real_screen):
     volume_idx = volume_list.index(volume)
     volume_text = f"Music Volume -> {volume_list[volume_idx]}"
 
-    difficulty_list = ["Easy", "Medium", "Hard"]
+    difficulty_list = ["Easy", "Medium", "Hard", "Endless"]
     difficulty_idx = difficulty_list.index(difficulty)
     difficulty_text = f"Difficulty -> {difficulty_list[difficulty_idx]}"
 
