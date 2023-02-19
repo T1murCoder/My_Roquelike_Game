@@ -5,7 +5,7 @@ import math
 import pygame
 import pytmx
 
-from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image
+from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image, get_difficulty_from_json
 from loading import loading_scene
 from game_over import game_over_scene
 from win import win_scene
@@ -308,10 +308,6 @@ class Enemy(pygame.sprite.Sprite):
                 Heart(self.rect.centerx, self.rect.centery, [all_sprites])
             self.kill()
             kills += 1
-            if kills == enemies_count:
-                global running, win
-                running = False
-                win = True
             enemy_death_snd.play()
         if pygame.sprite.spritecollideany(self, bullet_sprites):
             self.health -= 1
@@ -476,6 +472,37 @@ def spawn_enemies(count):
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
 
 
+def time_bar(surface, time):
+    global current_time
+
+    if current_time > 0:
+        TIME = time
+        loading_bg_image = pygame.transform.scale(load_image("loading/loading_bar_background.png"), (width // 2, 60))
+        loading_bar_image = load_image("loading/loading_bar.png")
+
+        loading_bg_pos = 40
+        loading_bar_height = 55
+
+        loading_bg_rect = loading_bg_image.get_rect(center=(width // 2, loading_bg_pos))
+        loading_bar_rect = loading_bar_image.get_rect(midleft=(width // 2 - loading_bg_image.get_width() // 2 + 15,
+                                                               loading_bg_pos + loading_bar_height))
+
+        i = current_time
+
+        loading_bar_width = i / TIME * (loading_bg_image.get_width() - 25)
+        loading_bar_image_resized = pygame.transform.scale(loading_bar_image,
+                                                           (int(loading_bar_width), loading_bar_height))
+
+        surface.blit(loading_bg_image, loading_bg_rect)
+        surface.blit(loading_bar_image_resized, loading_bar_rect)
+
+        current_time -= 1
+        if current_time == 0:
+            global running, win
+            running = False
+            win = True
+
+
 if __name__ == '__main__':
     fps = 30
 
@@ -493,6 +520,17 @@ if __name__ == '__main__':
 
     sfx_volume = get_sfx_volume_from_json() / 100
 
+    difficulty = get_difficulty_from_json()
+
+    if difficulty == "Easy":
+        time = 60
+    elif difficulty == "Medium":
+        time = 300
+    else:
+        time = 600
+
+    TIME = time * fps
+
     gun_shot_snd = pygame.mixer.Sound("data/sounds/gun_shot.mp3")
     getting_damage_snd = pygame.mixer.Sound("data/sounds/getting_damage.wav")
     enemy_death_snd = pygame.mixer.Sound("data/sounds/enemy_death.mp3")
@@ -503,6 +541,9 @@ if __name__ == '__main__':
 
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
+    # TODO: Пофиксить спавн врагов
+    # TODO: Сделать счётчик киллов
+    # TODO: Сделать постоянный спавн врагов
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -516,6 +557,8 @@ if __name__ == '__main__':
     wall_sprites = pygame.sprite.Group()
 
     interface_sprites = pygame.sprite.Group()
+
+    current_time = TIME
 
     # create Camera
     camera = Camera()
@@ -567,10 +610,14 @@ if __name__ == '__main__':
         gun_sprites.update()
         gun_sprites.draw(virtual_screen)
 
+        time_bar(virtual_screen, TIME)
+
         crosshair_sprite.update()
         crosshair_sprite.draw(virtual_screen)
 
-        screen.blit(pygame.transform.scale(virtual_screen, (1920, 1080)), (0, 0))
+        if screen.get_size() == (1920, 1200):
+            virtual_screen = pygame.transform.scale(virtual_screen, (1920, 1200))
+        screen.blit(virtual_screen, (0, 0))
         pygame.display.flip()
 
     if win:

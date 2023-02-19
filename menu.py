@@ -6,8 +6,6 @@ import json
 
 
 pygame.init()
-size = width, height = 1920, 1080
-virtual_screen = pygame.display.set_mode(size)
 FONT = pygame.font.Font(None, 50)
 
 
@@ -254,7 +252,7 @@ def menu_scene(surface, real_screen):
     def set_difficulty():
         nonlocal difficulty
         option_text = menu_settings_page.option_text[6]
-        difficulty = option_text[option_text.find('>') + 1:]
+        difficulty = option_text[option_text.find('>') + 2:]
 
     menu_main_page = Menu(volume=interface_volume)
     menu_main_page.append_option("Play", start_game)
@@ -316,7 +314,7 @@ def menu_scene(surface, real_screen):
         else:
             menu_settings_page.draw(surface, 100, 100, 50)
 
-        surface.blit(hints_image, (50, height - 25 - hints_image.get_height()))
+        surface.blit(hints_image, (50, surface.get_height() - 25 - hints_image.get_height()))
 
         real_screen.blit(pygame.transform.scale(surface, real_screen.get_size()), (0, 0))
 

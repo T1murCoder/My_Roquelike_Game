@@ -15,7 +15,10 @@ def game_over_scene(surface, real_screen):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     game_over_running = False
-        surface.blit(pygame.transform.scale(game_over_image, (1920, 1080)), (0, 0))
+        if real_screen.get_size() == (1920, 1200):
+            surface.blit(pygame.transform.scale(game_over_image, (1920, 1200)), (0, 0))
+        else:
+            surface.blit(pygame.transform.scale(game_over_image, (1920, 1080)), (0, 0))
 
         real_screen.blit(pygame.transform.scale(surface, real_screen.get_size()), (0, 0))
 
