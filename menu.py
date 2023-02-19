@@ -101,11 +101,19 @@ def get_sfx_volume_from_json():
     return volume
 
 
+def get_difficulty_from_json():
+    with open("data/settings/settings.json") as file:
+        f = file.read()
+        data = json.loads(f)
+        difficulty = data["difficulty"]
+    return difficulty
+
+
 def menu_scene(surface, real_screen):
     hints_image = load_image("menu/controls_hint.png")
 
     def load_settings_data():
-        nonlocal fullscreen_toggled, music_toggled, volume, interface_volume, sfx_volume
+        nonlocal fullscreen_toggled, music_toggled, volume, interface_volume, sfx_volume, difficulty
         with open("data/settings/settings.json") as file:
             f = file.read()
             data = json.loads(f)
@@ -114,6 +122,7 @@ def menu_scene(surface, real_screen):
             volume = data["music_volume"]
             interface_volume = data["interface_volume"]
             sfx_volume = data["sfx_volume"]
+            difficulty = data["difficulty"]
             if not (0 <= volume <= 100):
                 volume = 100
 
@@ -126,6 +135,7 @@ def menu_scene(surface, real_screen):
     volume = 100
     interface_volume = 100
     sfx_volume = 100
+    difficulty = "Easy"
     screen_resolution = get_size_from_json()
 
     load_settings_data()
@@ -144,6 +154,10 @@ def menu_scene(surface, real_screen):
 
     volume_idx = volume_list.index(volume)
     volume_text = f"Music Volume -> {volume_list[volume_idx]}"
+
+    difficulty_list = ["Easy", "Medium", "Hard"]
+    difficulty_idx = difficulty_list.index(difficulty)
+    difficulty_text = f"Difficulty -> {difficulty_list[difficulty_idx]}"
 
     screen_resolution_list = [[800, 600], [1280, 720], [1920, 1080], [1920, 1200]]
     screen_resolution_text = f"Screen resolution -> {screen_resolution[0]}x{screen_resolution[1]}"
@@ -167,7 +181,8 @@ def menu_scene(surface, real_screen):
                 "music_volume": volume,
                 "interface_volume": interface_volume,
                 "sfx_volume": sfx_volume,
-                "size": screen_resolution
+                "size": screen_resolution,
+                "difficulty": difficulty
                 }
             json.dump(dt, file)
 
@@ -236,6 +251,11 @@ def menu_scene(surface, real_screen):
         option_text = menu_settings_page.option_text[5]
         sfx_volume = int(option_text[option_text.find('>') + 1:])
 
+    def set_difficulty():
+        nonlocal difficulty
+        option_text = menu_settings_page.option_text[6]
+        difficulty = option_text[option_text.find('>') + 1:]
+
     menu_main_page = Menu(volume=interface_volume)
     menu_main_page.append_option("Play", start_game)
     menu_main_page.append_option("Settings", switch_page)
@@ -256,6 +276,9 @@ def menu_scene(surface, real_screen):
 
     menu_settings_page.append_option(sfx_volume_text, set_sfx_volume,
                                      [f"Sfx volume -> {i}" for i in volume_list], sfx_volume_idx, True)
+
+    menu_settings_page.append_option(difficulty_text, set_difficulty,
+                                     [f"Difficulty -> {elem}" for elem in difficulty_list], difficulty_idx, True)
 
     menu_settings_page.append_option("Back", switch_page)
     set_music_volume()
