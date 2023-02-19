@@ -5,7 +5,7 @@ import math
 import pygame
 import pytmx
 
-from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image, get_difficulty_from_json
+from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_image, get_difficulty_from_json, FONT
 from loading import loading_scene
 from game_over import game_over_scene
 from win import win_scene
@@ -27,11 +27,12 @@ class Level:
         self.width = self.map.width
         self.height = self.map.height
         self.tile_size = self.map.tilewidth
+        self.map_left_up_border = None
+        self.map_right_down_border = None
         self.create_tile_sprites()
 
     def create_tile_sprites(self):
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
-        # TODO: Добавить метку для спавна игрока, если её нет, то спавнить как сейчас
         walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(9)]
 
         for y in range(self.height):
@@ -472,6 +473,13 @@ def spawn_enemies(count):
             enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
 
 
+def draw_kills(surface, real_screen):
+    width, height = real_screen.get_size()
+    text = FONT.render(f"Kills: {kills}", True, (255, 255, 255))
+    font_width, font_height = text.get_size()
+    surface.blit(text, (width - font_width - 10, font_height - 30))
+
+
 def time_bar(surface, time):
     global current_time
 
@@ -525,9 +533,9 @@ if __name__ == '__main__':
     if difficulty == "Easy":
         time = 60
     elif difficulty == "Medium":
-        time = 300
+        time = 180
     else:
-        time = 600
+        time = 300
 
     TIME = time * fps
 
@@ -542,7 +550,6 @@ if __name__ == '__main__':
     # TODO: !Сделать арену на выживание!
     # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
     # TODO: Пофиксить спавн врагов
-    # TODO: Сделать счётчик киллов
     # TODO: Сделать постоянный спавн врагов
 
     all_sprites = AllSpritesGroup()
@@ -612,12 +619,15 @@ if __name__ == '__main__':
 
         time_bar(virtual_screen, TIME)
 
+        draw_kills(virtual_screen, screen)
+
         crosshair_sprite.update()
         crosshair_sprite.draw(virtual_screen)
 
         if screen.get_size() == (1920, 1200):
             virtual_screen = pygame.transform.scale(virtual_screen, (1920, 1200))
         screen.blit(virtual_screen, (0, 0))
+
         pygame.display.flip()
 
     if win:
