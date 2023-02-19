@@ -9,6 +9,7 @@ from menu import menu_scene, get_size_from_json, get_sfx_volume_from_json, load_
 from loading import loading_scene
 from game_over import game_over_scene
 from win import win_scene
+from results import results_scene
 
 
 pygame.mixer.pre_init()
@@ -590,6 +591,8 @@ if __name__ == '__main__':
     enemy_spawn_timer = interval * fps
     current_spawn_timer = 0
     ready_to_spawn = True
+    if endless_flag:
+        waves_survived = -1
 
     gun_shot_snd = pygame.mixer.Sound("data/sounds/gun_shot.mp3")
     getting_damage_snd = pygame.mixer.Sound("data/sounds/getting_damage.wav")
@@ -655,6 +658,8 @@ if __name__ == '__main__':
         if ready_to_spawn:
             spawn_enemies(enemies_count_spawn, hp_drop_chance)
             ready_to_spawn = False
+            if endless_flag:
+                waves_survived += 1
         else:
             current_spawn_timer += 1
             if current_spawn_timer == enemy_spawn_timer:
@@ -683,10 +688,12 @@ if __name__ == '__main__':
         screen.blit(virtual_screen, (0, 0))
 
         pygame.display.flip()
-
-    if win:
-        win_scene(virtual_screen, screen)
-    elif game_over:
-        game_over_scene(virtual_screen, screen)
+    if endless_flag:
+        results_scene(virtual_screen, screen, difficulty, kills, waves_survived)
+    else:
+        if win:
+            win_scene(virtual_screen, screen)
+        elif game_over:
+            game_over_scene(virtual_screen, screen)
 
     pygame.quit()
