@@ -54,10 +54,10 @@ class Level:
 
                     if not self.map_left_up_border:
                         self.map_left_up_border = Tile(pygame.Surface((self.tile_size, self.tile_size)),
-                                                       pos_x, pos_y, system_sprites)
+                                                       pos_x, pos_y, level_sprites)
         if pos_x:
             self.map_right_down_border = Tile(pygame.Surface((self.tile_size, self.tile_size)),
-                                              pos_x, pos_y, system_sprites)
+                                              pos_x, pos_y, level_sprites)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -232,8 +232,8 @@ class Enemy(pygame.sprite.Sprite):
                     load_image("enemy/enemy-walk_3_R.png"),
                     load_image("enemy/enemy-walk_4_R.png")]
     left_images = [pygame.transform.flip(elem, True, False) for elem in right_images]
-    # image = pygame.Surface((30, 50))
-    # pygame.draw.rect(image, pygame.Color("red"), (0, 0, 30, 50))
+
+    vision_range = 500
 
     def __init__(self, x, y, health, *group):
         super().__init__(*group)
@@ -241,7 +241,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.vision_range = 500
+        self.vision_range = Enemy.vision_range
         self.speed = 5
         self.phase = 0
         self.orientation = "right"
@@ -468,9 +468,38 @@ class AllSpritesGroup(pygame.sprite.Group):
             surface.blit(sprite.image, sprite.rect.topleft)
 
 
+def get_enemy_coords():
+    left_x_border, up_y_border = level.map_left_up_border.rect[:2]
+    right_x_border, down_y_border = level.map_right_down_border.rect[:2]
+    return left_x_border, up_y_border, right_x_border, down_y_border
+
+
 def spawn_enemies(count):
     for i in range(count):
-        enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
+        border_min_x, border_min_y, border_max_x, border_max_y = get_enemy_coords()
+
+        player_x, player_y = player.rect[:2]
+
+        min_enemy_x = player_x - Enemy.vision_range
+        max_enemy_x = player_x + player.image.get_width() + Enemy.vision_range
+
+        min_enemy_y = player_y - Enemy.vision_range
+        max_enemy_y = player_y + player.image.get_height() + Enemy.vision_range
+
+        enemy_x = random.randint(min_enemy_x, max_enemy_x)
+        enemy_y = random.randint(min_enemy_y, max_enemy_y)
+
+        enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+        while pygame.sprite.spritecollideany(enemy, player_sprite)\
+                or pygame.sprite.spritecollideany(enemy, wall_sprites)\
+                or not border_min_x < enemy_x < border_max_x\
+                or not border_min_y < enemy_y < border_max_y:
+            enemy.kill()
+            enemy_x = random.randint(min_enemy_x, max_enemy_x)
+            enemy_y = random.randint(min_enemy_y, max_enemy_y)
+            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+
+        '''enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
         enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
         enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
         while pygame.sprite.spritecollideany(enemy, player_sprite)\
@@ -478,7 +507,7 @@ def spawn_enemies(count):
             enemy.kill()
             enemy_x = random.randint(10, width - Enemy.stand_image_right.get_rect()[2] - 10)
             enemy_y = random.randint(10, height - Enemy.stand_image_right.get_rect()[3] - 10)
-            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])'''
 
 
 def draw_kills(surface, real_screen):
@@ -560,10 +589,7 @@ if __name__ == '__main__':
     getting_damage_snd.set_volume(sfx_volume)
     enemy_death_snd.set_volume(sfx_volume)
 
-    # TODO: !Сделать арену на выживание!
-    # TODO: Сделать спавн врагов для арены (делать ли волны врагов?)
-    # TODO: Пофиксить спавн врагов
-    # TODO: Сделать постоянный спавн врагов
+    # TODO: Сделать разное количество спавна мобов для разных уровней сложности, Интервалы и т.д.
 
     all_sprites = AllSpritesGroup()
     borders_sprites = pygame.sprite.Group()
@@ -576,9 +602,11 @@ if __name__ == '__main__':
     level_sprites = pygame.sprite.Group()
     wall_sprites = pygame.sprite.Group()
 
-    system_sprites = pygame.sprite.Group()
-
     interface_sprites = pygame.sprite.Group()
+
+    enemy_spawn_timer = 30 * fps
+    current_spawn_timer = 0
+    ready_to_spawn = True
 
     current_time = TIME
 
@@ -593,8 +621,6 @@ if __name__ == '__main__':
     # create Player
     player = Player(width // 2, height // 2, [player_sprite, all_sprites])
     player_gun = Gun(player.rect.centerx, player.rect.centery - 20, [gun_sprites])
-
-    spawn_enemies(enemies_count)
 
     game_over = False
     win = False
@@ -621,6 +647,14 @@ if __name__ == '__main__':
 
         for sprite in level_sprites:
             camera.apply(sprite)
+
+        if ready_to_spawn:
+            spawn_enemies(enemies_count)
+            ready_to_spawn = False
+        else:
+            current_spawn_timer += 1
+            if current_spawn_timer == enemy_spawn_timer:
+                ready_to_spawn = True
 
         virtual_screen.fill(pygame.Color("black"))
 
