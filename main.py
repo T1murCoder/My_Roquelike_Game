@@ -35,7 +35,9 @@ class Level:
         # пришлось расположить тайлы, которые отвечают за стенки на краю карты
         walls_gids = [self.map.get_tile_gid(x, 999, 0) for x in range(10)]
 
-        for y in range(self.height):
+        pos_x, pos_y = None, None
+
+        for y in range(self.height - 1):
             for x in range(self.width):
 
                 image = self.map.get_tile_image(x, y, 0)
@@ -46,10 +48,16 @@ class Level:
 
                     gid = self.map.get_tile_gid(x, y, 0)
                     if gid in walls_gids:
-                        pass
                         Tile(image, pos_x, pos_y, [level_sprites, wall_sprites])
                     else:
                         Tile(image, pos_x, pos_y, level_sprites)
+
+                    if not self.map_left_up_border:
+                        self.map_left_up_border = Tile(pygame.Surface((self.tile_size, self.tile_size)),
+                                                       pos_x, pos_y, system_sprites)
+        if pos_x:
+            self.map_right_down_border = Tile(pygame.Surface((self.tile_size, self.tile_size)),
+                                              pos_x, pos_y, system_sprites)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -567,6 +575,8 @@ if __name__ == '__main__':
 
     level_sprites = pygame.sprite.Group()
     wall_sprites = pygame.sprite.Group()
+
+    system_sprites = pygame.sprite.Group()
 
     interface_sprites = pygame.sprite.Group()
 
