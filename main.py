@@ -497,7 +497,7 @@ def spawn_enemies(count, hp_drop_chance):
             enemy.kill()
             enemy_x = random.randint(min_enemy_x, max_enemy_x)
             enemy_y = random.randint(min_enemy_y, max_enemy_y)
-            enemy = Enemy(enemy_x, enemy_y, 3, [enemies_sprites, all_sprites])
+            enemy = Enemy(enemy_x, enemy_y, 3, hp_drop_chance, [enemies_sprites, all_sprites])
 
 
 def draw_kills(surface, real_screen):
@@ -575,7 +575,7 @@ if __name__ == '__main__':
     elif difficulty == "Insane":
         time = -1
         interval = 15
-        enemies_count_spawn = 9
+        enemies_count_spawn = 11
         endless_flag = True
         hp_drop_chance = [0, 0, 0, 0, 0, 0, 0, 0, 1]
     else:
