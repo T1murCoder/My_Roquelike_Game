@@ -658,6 +658,7 @@ if __name__ == '__main__':
         if ready_to_spawn:
             spawn_enemies(enemies_count_spawn, hp_drop_chance)
             ready_to_spawn = False
+            current_spawn_timer = 0
             if endless_flag:
                 waves_survived += 1
         else:
